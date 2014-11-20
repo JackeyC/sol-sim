@@ -2,7 +2,6 @@ package com.schevio.solsim;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.FloatMath;
 import android.view.MotionEvent;
 
 /**
