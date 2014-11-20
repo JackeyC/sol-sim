@@ -3,6 +3,7 @@ package com.schevio.solsim;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 import android.util.FloatMath;
 import android.util.Log;
 
@@ -16,21 +17,18 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
 //    private PolyStar3D mPolyStar3D;
-    private Square mSquare;
+    private SpaceShip mSpaceShip;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
     private final float[] mRotationMatrix = new float[16];
-    private final float[] mModelMatrix = new float[16];
-    private final float[] tempMatrix = new float[16];
+    private final float[] mTiltMatrix = new float[16];
+    private final float[] mEarthRotationMatrix = new float[16];
 
-    private float mAngle;
     private float mAngle_X;
     private float mAngle_Y;
-    private float pole_X;
-    private float pole_Y;
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -38,8 +36,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-//        mPolyStar3D = new PolyStar3D();
-        mSquare = new Square();
+        mSpaceShip = new SpaceShip();
     }
 
     @Override
@@ -49,36 +46,56 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Redraw Background colour
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        float x_coord = 4 * FloatMath.sin(mAngle_Y) * FloatMath.cos(mAngle_X);
-        float y_coord = 4 * FloatMath.sin(mAngle_Y) * FloatMath.sin(mAngle_X);
-        float z_coord = 4 * FloatMath.cos(mAngle_Y);
+        float cam_distance = 4;
+
+        if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
+            mAngle_X = 0;
+        }
+        if (mAngle_Y <= -MyGLSurfaceView.TwoPi | mAngle_Y >= MyGLSurfaceView.TwoPi) {
+            mAngle_Y = 0;
+        }
+
+        float cam_x = cam_distance * FloatMath.sin(mAngle_X);
+        float cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
+        float cam_z = cam_distance * FloatMath.sin(mAngle_Y);
+
+        //Debug
+//        System.out.println("cam x = " + cam_x);
+//        System.out.println("cam y = " + cam_y);
+//        System.out.println("cam z = " + cam_z);
 
         // Set the camera position
-        Matrix.setLookAtM(mViewMatrix, 0, x_coord, y_coord, z_coord, 0f, 0f, 0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, 0f, 0f, 0f, 0f, 0f, 1f);
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
-        // Draw shape
-//        mCircle.draw(mMVPMatrix);
-//        mPolygon.draw(mMVPMatrix);
-        mSquare.draw(mMVPMatrix);
+        // Draw static
+//        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
+        long time = SystemClock.uptimeMillis() % 4000L;
+        float angle = 0.090f * ((int) time);
 
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-//        long time = SystemClock.uptimeMillis() % 4000L;
-//        float angle = 0.090f * ((int) time);
+        if (angle >= 360) {
+            angle = 0;
+        }
 
-        Matrix.setRotateM(mRotationMatrix, 0, 0, 0f, 1f, 0f);
+        //Debug
+//        System.out.println("self rotate angle = "+ angle);
+
+        Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+        Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
+
+        Matrix.multiplyMM(mEarthRotationMatrix, 0, mTiltMatrix, 0, mRotationMatrix, 0);
 
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
 
-        // Draw star
+        // Draw rotate
+        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
 //        Matrix.setRotateM(mRotationMatrix, 0, (mAngle + 180) % 360, 0f, 1f, 0f);
 //        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);

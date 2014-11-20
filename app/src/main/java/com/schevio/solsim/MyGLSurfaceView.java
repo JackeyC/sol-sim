@@ -2,6 +2,7 @@ package com.schevio.solsim;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.FloatMath;
 import android.view.MotionEvent;
 
 /**
@@ -22,10 +23,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
         setRenderer(mRenderer);
 
         // Render the view only when there is a change in the drawing data
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
-    private final float TOUCH_SCALE_FACTOR = 180f / 360;
+    public static float Pi = 3.14159f;
+    public static float TwoPi = 2 * Pi;
+    public static float HalfPi = Pi / 2;
+
+    private final float TOUCH_SCALE_FACTOR = Pi / 720;
     private float mPreviousX;
     private float mPreviousY;
 
@@ -44,16 +49,20 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
-                mRenderer.setAngle_X(mRenderer.getAngle_X() + (dy * TOUCH_SCALE_FACTOR));
-                mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dx * TOUCH_SCALE_FACTOR));
+                if (mRenderer.getAngle_Y() > HalfPi) {
+                    dy = -dy;
+                }
+
+                mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));
+                mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dy * TOUCH_SCALE_FACTOR));
 
                 requestRender();
 
-                System.out.println("dx = " + dx);
-                System.out.println("dy = " + dy);
-
-                System.out.println("angle = " + mRenderer.getAngle_Y());
-                System.out.println("angle = " + mRenderer.getAngle_X());
+                //Debug
+//                System.out.println("dx = " + dx);
+//                System.out.println("dy = " + dy);
+//                System.out.println("angle X = " + mRenderer.getAngle_X());
+//                System.out.println("angle Y = " + mRenderer.getAngle_Y());
         }
 
         mPreviousX = x;
