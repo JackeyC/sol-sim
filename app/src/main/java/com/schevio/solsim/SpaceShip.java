@@ -48,11 +48,18 @@ public class SpaceShip {
             0.0f, 0.0f, -0.5f
     };
 
-    private final short drawOrder[] = { 0, 1, 2, 0, 2, 3, 0, 4, 1, 2, 4, 3 }; // order to draw vertices
+    private final short drawOrder[] = { 0, 1, 2, 0, 2, 3, 0, 4, 1, 1, 4, 2, 2, 4, 3, 3, 4, 0 }; // order to draw vertices
 
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
-    float color[] = { 0.8f, 0.8f, 0.8f, 0.5f };
+    float color[] = {
+            0.8f, 0.8f, 0.8f, 0.0f,
+            0.8f, 0.8f, 0.8f, 0.0f,
+            1.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f, 1.0f
+    };
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
