@@ -3,7 +3,6 @@ package com.schevio.solsim;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 import android.util.FloatMath;
 import android.util.Log;
 
@@ -15,8 +14,11 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
+    float angle;
+
     private static final String TAG = "MyGLRenderer";
 //    private PolyStar3D mPolyStar3D;
+    private Earth mEarth;
     private SpaceShip mSpaceShip;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
@@ -36,6 +38,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
+        mEarth = new Earth();
         mSpaceShip = new SpaceShip();
     }
 
@@ -74,8 +77,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
-        long time = SystemClock.uptimeMillis() % 4000L;
-        float angle = 0.090f * ((int) time);
+//        long time = SystemClock.uptimeMillis() % 4000L;
+//        float angle = 0.090f * ((int) time);
+
 
         if (angle >= 360) {
             angle = 0;
@@ -84,8 +88,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         //Debug
 //        System.out.println("self rotate angle = "+ angle);
 
-        Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+        //Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+        Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
         Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
+
+        angle += 0.1;
 
         Matrix.multiplyMM(mEarthRotationMatrix, 0, mTiltMatrix, 0, mRotationMatrix, 0);
 
@@ -95,7 +102,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
 
         // Draw rotate
-        mSpaceShip.draw(scratch);
+        mEarth.draw(scratch);
+//        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
 //        Matrix.setRotateM(mRotationMatrix, 0, (mAngle + 180) % 360, 0f, 1f, 0f);
 //        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
