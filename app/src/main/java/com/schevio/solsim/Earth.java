@@ -38,6 +38,9 @@ public class Earth {
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 3;
+
+
+
     static float Vertices[] = {
             // f 1//1 14//1 13//1
             -3.30423519233678e-18f, -0.5f, -1.32169407693471e-18f,
@@ -360,6 +363,9 @@ public class Earth {
             0.138194f, 0.22361f, -0.4253245f,
             0.081228f, 0.425327f, -0.2499975f,
     };
+
+
+
 
     static float Normals[] = {
             // f 1//1 14//1 13//1
