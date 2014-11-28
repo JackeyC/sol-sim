@@ -31,6 +31,7 @@ public class Earth {
                     "}";
 
     private final FloatBuffer vertexBuffer;
+    private final FloatBuffer normalBuffer;
     private final int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
@@ -709,6 +710,13 @@ public class Earth {
         vertexBuffer.put(Vertices);
         vertexBuffer.position(0);
 
+        // initialize vertex byte buffer for com.example.android.shape coordinates
+        bb = ByteBuffer.allocateDirect(Normals.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        normalBuffer = bb.asFloatBuffer();
+        normalBuffer.put(Normals);
+        normalBuffer.position(0);
+
         // prepare shaders and OpenGL program
         int vertexShader = MyGLRenderer.loadShader(
                 GLES20.GL_VERTEX_SHADER,
@@ -738,18 +746,28 @@ public class Earth {
         // get handle to vertex shader's vPosition member
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
 
+        vertexBuffer.position(0);
+        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
+                vertexStride, vertexBuffer);
+
         // Enable a handle to the vertices
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         // Prepare the coordinate data
-        GLES20.glVertexAttribPointer(
-                mPositionHandle, COORDS_PER_VERTEX,
-                GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer
-        );
+//        GLES20.glVertexAttribPointer(
+//                mPositionHandle, COORDS_PER_VERTEX,
+//                GLES20.GL_FLOAT, false,
+//                vertexStride, vertexBuffer
+//        );
 
         // get handle to fragment shader's vColor member
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+
+//        GLES20.glVertexAttribPointer(
+//                mColorHandle, COORDS_PER_VERTEX,
+//                GLES20.GL_FLOAT, false,
+//                vertexStride, normalBuffer
+//        );
 
         // Set color for drawing the triangle
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
