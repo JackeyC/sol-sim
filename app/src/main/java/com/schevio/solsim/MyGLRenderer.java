@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Build;
+import android.os.SystemClock;
 import android.util.FloatMath;
 import android.util.Log;
 
@@ -60,6 +61,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             mAngle_Y = 0;
         }
 
+//        int max = 360;
+//        int i=0;
+//        i = (i+1)%max;
+//        i = (i-1+max)%max;
+
         float cam_x = cam_distance * FloatMath.sin(mAngle_X);
         float cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
         float cam_z = cam_distance * FloatMath.sin(mAngle_Y);
@@ -79,13 +85,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
-//        long time = SystemClock.uptimeMillis() % 4000L;
-//        float angle = 0.090f * ((int) time);
-
-
-        if (angle >= 360) {
-            angle = 0;
-        }
+        int period = 12000;
+        long time = SystemClock.uptimeMillis() % period;
+        float angle = 360f / period * ((int) time);
 
         //Debug
 //        System.out.println("self rotate angle = "+ angle);
@@ -94,7 +96,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
         Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
 
-        angle += 0.1;
+//        angle += 0.1;
 
         Matrix.multiplyMM(mEarthRotationMatrix, 0, mTiltMatrix, 0, mRotationMatrix, 0);
 

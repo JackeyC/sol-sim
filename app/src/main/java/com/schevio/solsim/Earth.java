@@ -14,14 +14,47 @@ public class Earth {
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
-            "uniform mat4 uMVPMatrix;" +
-                    "attribute vec4 vPosition;" +
-                    "void main() {" +
+            "uniform mat4 u_MVPMatrix;      \n"		// A constant representing the combined model/view/projection matrix.
+                    + "uniform mat4 uMVMatrix;       \n"		// A constant representing the combined model/view matrix.
+//                    + "uniform vec3 uLightPos;       \n"	    // The position of the light in eye space.
+
+                    + "attribute vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
+//                    + "attribute vec4 aColor;        \n"		// Per-vertex color information we will pass in.
+//                    + "attribute vec3 aNormal;       \n"		// Per-vertex normal information we will pass in.
+
+//                    + "varying vec4 vColor;          \n"		// This will be passed into the fragment shader.
+
+                    + "void main() {        \n"
                     // The matrix must be included as a modifier of gl_Position.
                     // Note that the uMVPMatrix factor *must be first* in order
                     // for the matrix multiplication product to be correct.
-                    "  gl_Position = uMVPMatrix * vPosition;" +
-                    "}";
+
+                    // Transform the vertex into eye space.
+//                    + "   vec3 modelViewVertex = vec3(u_MVMatrix * a_Position);              \n"
+
+                    // Transform the normal's orientation into eye space.
+//                    + "   vec3 modelViewNormal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));     \n"
+
+                    // Will be used for attenuation.
+//                    + "   float distance = length(u_LightPos - modelViewVertex);             \n"
+
+                    // Get a lighting direction vector from the light to the vertex.
+//                    + "   vec3 lightVector = normalize(u_LightPos - modelViewVertex);        \n"
+
+                    // Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
+                    // pointing in the same direction then it will get max illumination.
+//                    + "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);       \n"
+
+                    // Attenuate the light based on distance.
+//                    + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
+
+                    // Multiply the color by the illumination level. It will be interpolated across the triangle.
+//                    + "   v_Color = a_Color * diffuse;                                       \n"
+
+                    // gl_Position is a special variable used to store the final position.
+                    // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
+                    + "   gl_Position = uMVPMatrix * vPosition;                            \n"
+                    + "}                                                                   \n";
 
     private final String fragmentShaderCode =
             "precision mediump float;" +
@@ -746,22 +779,35 @@ public class Earth {
         // get handle to vertex shader's vPosition member
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
 
+        // Prepare the coordinate data
         vertexBuffer.position(0);
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer);
+        GLES20.glVertexAttribPointer(mPositionHandle,
+                COORDS_PER_VERTEX,
+                GLES20.GL_FLOAT,
+                false,
+                vertexStride,
+                vertexBuffer
+        );
 
         // Enable a handle to the vertices
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-        // Prepare the coordinate data
-//        GLES20.glVertexAttribPointer(
-//                mPositionHandle, COORDS_PER_VERTEX,
-//                GLES20.GL_FLOAT, false,
-//                vertexStride, vertexBuffer
-//        );
-
         // get handle to fragment shader's vColor member
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+//
+//        // Prepare the normal data
+//        normalBuffer.position(0);
+//        GLES20.glVertexAttribPointer(
+//                mPositionHandle,
+//                COORDS_PER_VERTEX,
+//                GLES20.GL_FLOAT,
+//                false,
+//                0,
+//                normalBuffer
+//        );
+
+        // Enable a handle to the vertices
+//        GLES20.glEnableVertexAttribArray(mPositionHandle);
 
 //        GLES20.glVertexAttribPointer(
 //                mColorHandle, COORDS_PER_VERTEX,
