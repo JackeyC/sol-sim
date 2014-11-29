@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SolSim.iml" filepath="$PROJECT_DIR$/SolSim.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sol-sim.iml" filepath="$PROJECT_DIR$/sol-sim.iml" />
     </modules>
   </component>
 </project>
