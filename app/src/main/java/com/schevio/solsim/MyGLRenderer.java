@@ -1,10 +1,8 @@
 package com.schevio.solsim;
 
-import android.annotation.TargetApi;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.Build;
 import android.os.SystemClock;
 import android.util.FloatMath;
 import android.util.Log;
@@ -57,8 +55,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
-        if (mAngle_Y <= -MyGLSurfaceView.TwoPi | mAngle_Y >= MyGLSurfaceView.TwoPi) {
-            mAngle_Y = 0;
+        if (mAngle_Y < -MyGLSurfaceView.TwoPi) {
+            mAngle_Y = -MyGLSurfaceView.TwoPi;
+        }
+        else if (mAngle_Y > MyGLSurfaceView.TwoPi) {
+            mAngle_Y = MyGLSurfaceView.TwoPi;
         }
 
 //        int max = 360;
@@ -94,7 +95,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         //Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
         Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
-        Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
+        Matrix.setRotateM(mRotationMatrix, 0, 0, 0f, 0f, 1f);
 
 //        angle += 0.1;
 
