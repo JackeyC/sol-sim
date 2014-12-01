@@ -20,6 +20,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = "MyGLRenderer";
 //    private PolyStar3D mPolyStar3D;
     private Earth mEarth;
+    private Axis mAxis;
     private SpaceShip mSpaceShip;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
@@ -30,8 +31,26 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mTiltMatrix = new float[16];
     private final float[] mEarthRotationMatrix = new float[16];
 
+    /**
+     * Stores a copy of the model matrix specifically for the light position.
+     */
+    private float[] mLightModelMatrix = new float[16];
+
     private float mAngle_X;
     private float mAngle_Y;
+
+    /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
+     *  we multiply this by our transformation matrices. */
+    private final float[] mLightPosInModelSpace = new float[] {0.0f, 0.0f, 0.0f, 1.0f};
+
+    /** Used to hold the current position of the light in world space (after transformation via model matrix). */
+    private final float[] mLightPosInWorldSpace = new float[4];
+
+    /** Used to hold the transformed position of the light in eye space (after transformation via modelview matrix) */
+    private final float[] mLightPosInEyeSpace = new float[4];
+
+    /** This is a handle to our light point program. */
+    private int mPointProgramHandle;
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -40,6 +59,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
         mEarth = new Earth();
+        mAxis = new Axis();
         mSpaceShip = new SpaceShip();
     }
 
@@ -55,12 +75,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
-        if (mAngle_Y < -MyGLSurfaceView.TwoPi) {
-            mAngle_Y = -MyGLSurfaceView.TwoPi;
-        }
-        else if (mAngle_Y > MyGLSurfaceView.TwoPi) {
-            mAngle_Y = MyGLSurfaceView.TwoPi;
-        }
+//        if (mAngle_Y < -MyGLSurfaceView.TwoPi) {
+//            mAngle_Y = -MyGLSurfaceView.TwoPi;
+//        }
+//        else if (mAngle_Y > MyGLSurfaceView.TwoPi) {
+//            mAngle_Y = MyGLSurfaceView.TwoPi;
+//        }
 
 //        int max = 360;
 //        int i=0;
@@ -79,6 +99,31 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set the camera position
         Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, 0f, 0f, 0f, 0f, 0f, 1f);
 
+        // Define a simple shader program for our point.
+        final String pointVertexShader =
+                "uniform mat4 u_MVPMatrix;      \n"
+                        +	"attribute vec4 aPosition;     \n"
+                        + "void main()                    \n"
+                        + "{                              \n"
+                        + "   gl_Position = uMVPMatrix * aPosition;   \n"
+                        + "   gl_PointSize = 5.0;         \n"
+                        + "}                              \n";
+
+        final String pointFragmentShader =
+                "precision mediump float;       \n"
+                        + "void main()                    \n"
+                        + "{                              \n"
+                        + "   gl_FragColor = vec4(1.0,    \n"
+                        + "   1.0, 1.0, 1.0);             \n"
+                        + "}                              \n";
+
+        final int pointVertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
+        final int pointFragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
+        mPointProgramHandle = createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle,
+                new String[] {"a_Position"});
+
+//        final String vertexShader = getVertexShader();
+
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
@@ -86,16 +131,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
-        int period = 12000;
+        int period = 24000;
         long time = SystemClock.uptimeMillis() % period;
         float angle = 360f / period * ((int) time);
 
         //Debug
 //        System.out.println("self rotate angle = "+ angle);
 
-        //Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
-        Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
-        Matrix.setRotateM(mRotationMatrix, 0, 0, 0f, 0f, 1f);
+        Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+//        Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
+        Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
 
 //        angle += 0.1;
 
@@ -107,6 +152,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
 
         // Draw rotate
+        mAxis.draw(scratch);
         mEarth.draw(scratch);
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
@@ -114,6 +160,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
 //        mPolyStar3D.draw(scratch);
+        // Draw a point to indicate the light.
+        GLES20.glUseProgram(mPointProgramHandle);
+        drawLight();
     }
 
     @Override
@@ -196,5 +245,28 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setAngle_Y(float angle_Y) {
         mAngle_Y = angle_Y;
+    }
+
+    /**
+     * Draws a point representing the position of the light.
+     */
+    private void drawLight()
+    {
+        final int pointMVPMatrixHandle = GLES20.glGetUniformLocation(mPointProgramHandle, "u_MVPMatrix");
+        final int pointPositionHandle = GLES20.glGetAttribLocation(mPointProgramHandle, "a_Position");
+
+        // Pass in the position.
+        GLES20.glVertexAttrib3f(pointPositionHandle, mLightPosInModelSpace[0], mLightPosInModelSpace[1], mLightPosInModelSpace[2]);
+
+        // Since we are not using a buffer object, disable vertex arrays for this attribute.
+        GLES20.glDisableVertexAttribArray(pointPositionHandle);
+
+        // Pass in the transformation matrix.
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mLightModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(pointMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+
+        // Draw the point.
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 1);
     }
 }
