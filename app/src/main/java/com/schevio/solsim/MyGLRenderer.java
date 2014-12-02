@@ -87,7 +87,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        i = (i+1)%max;
 //        i = (i-1+max)%max;
 
-        float cam_x = cam_distance * FloatMath.sin(mAngle_X);
+        float cam_x = cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
         float cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
         float cam_z = cam_distance * FloatMath.sin(mAngle_Y);
 
