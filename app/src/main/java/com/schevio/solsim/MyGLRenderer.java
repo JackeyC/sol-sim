@@ -21,6 +21,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //    private PolyStar3D mPolyStar3D;
     private Earth mEarth;
     private Axis mAxis;
+    private Moon mMoon;
     private SpaceShip mSpaceShip;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
@@ -28,8 +29,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
     private final float[] mRotationMatrix = new float[16];
-    private final float[] mTiltMatrix = new float[16];
+    private final float[] mEarthTiltMatrix = new float[16];
     private final float[] mEarthRotationMatrix = new float[16];
+    private final float[] mMoonMatrix = new float[16];
 
     /**
      * Stores a copy of the model matrix specifically for the light position.
@@ -38,6 +40,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private float mAngle_X;
     private float mAngle_Y;
+
+    float cam_x;
+    float cam_y;
+    float cam_z;
+    float focus_x;
+    float focus_y;
+    float focus_z;
 
     /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
      *  we multiply this by our transformation matrices. */
@@ -60,36 +69,39 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         mEarth = new Earth();
         mAxis = new Axis();
+        mMoon = new Moon();
         mSpaceShip = new SpaceShip();
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        float[] scratch = new float[16];
+        float[] earth = new float[16];
+        float[] moon = new float[16];
 
         // Redraw Background colour
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        float cam_distance = 4;
+        float cam_distance = 7f;
 
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
-//        if (mAngle_Y < -MyGLSurfaceView.TwoPi) {
-//            mAngle_Y = -MyGLSurfaceView.TwoPi;
-//        }
-//        else if (mAngle_Y > MyGLSurfaceView.TwoPi) {
-//            mAngle_Y = MyGLSurfaceView.TwoPi;
-//        }
+        if (mAngle_Y < -MyGLSurfaceView.HalfPi | mAngle_Y > MyGLSurfaceView.HalfPi) {
+            if (mAngle_Y < -MyGLSurfaceView.HalfPi) {
+                mAngle_Y = -MyGLSurfaceView.HalfPi;
+            } else {
+                mAngle_Y = MyGLSurfaceView.HalfPi;
+            }
+        }
 
 //        int max = 360;
 //        int i=0;
 //        i = (i+1)%max;
 //        i = (i-1+max)%max;
 
-        float cam_x = cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
-        float cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
-        float cam_z = cam_distance * FloatMath.sin(mAngle_Y);
+        cam_x = cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_z = cam_distance * FloatMath.sin(mAngle_Y);
 
         //Debug
 //        System.out.println("cam x = " + cam_x);
@@ -97,30 +109,30 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        System.out.println("cam z = " + cam_z);
 
         // Set the camera position
-        Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, 0f, 0f, 0f, 0f, 0f, 1f);
+        Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, focus_x, focus_y, focus_z, 0f, 0f, 1f);
 
         // Define a simple shader program for our point.
-        final String pointVertexShader =
-                "uniform mat4 u_MVPMatrix;      \n"
-                        +	"attribute vec4 aPosition;     \n"
-                        + "void main()                    \n"
-                        + "{                              \n"
-                        + "   gl_Position = uMVPMatrix * aPosition;   \n"
-                        + "   gl_PointSize = 5.0;         \n"
-                        + "}                              \n";
+//        final String pointVertexShader =
+//                "uniform mat4 u_MVPMatrix;      \n"
+//                        +	"attribute vec4 aPosition;     \n"
+//                        + "void main()                    \n"
+//                        + "{                              \n"
+//                        + "   gl_Position = uMVPMatrix * aPosition;   \n"
+//                        + "   gl_PointSize = 5.0;         \n"
+//                        + "}                              \n";
+//
+//        final String pointFragmentShader =
+//                "precision mediump float;       \n"
+//                        + "void main()                    \n"
+//                        + "{                              \n"
+//                        + "   gl_FragColor = vec4(1.0,    \n"
+//                        + "   1.0, 1.0, 1.0);             \n"
+//                        + "}                              \n";
 
-        final String pointFragmentShader =
-                "precision mediump float;       \n"
-                        + "void main()                    \n"
-                        + "{                              \n"
-                        + "   gl_FragColor = vec4(1.0,    \n"
-                        + "   1.0, 1.0, 1.0);             \n"
-                        + "}                              \n";
-
-        final int pointVertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
-        final int pointFragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
-        mPointProgramHandle = createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle,
-                new String[] {"a_Position"});
+//        final int pointVertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
+//        final int pointFragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
+//        mPointProgramHandle = createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle,
+//                new String[] {"a_Position"});
 
 //        final String vertexShader = getVertexShader();
 
@@ -134,26 +146,30 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         int period = 24000;
         long time = SystemClock.uptimeMillis() % period;
         float angle = 360f / period * ((int) time);
+        float radian = angle / MyGLSurfaceView.TwoPi;
 
-        //Debug
-//        System.out.println("self rotate angle = "+ angle);
-
-        Matrix.setRotateM(mTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
-//        Matrix.setRotateM(mTiltMatrix, 0, 0f, 0f, 1f, 0f);
+        Matrix.setRotateM(mEarthTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+//        Matrix.setRotateM(mEarthTiltMatrix, 0, 0f, 0f, 1f, 0f);
         Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
 
-//        angle += 0.1;
-
-        Matrix.multiplyMM(mEarthRotationMatrix, 0, mTiltMatrix, 0, mRotationMatrix, 0);
+        Matrix.multiplyMM(mEarthRotationMatrix, 0, mEarthTiltMatrix, 0, mRotationMatrix, 0);
 
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
+        Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
 
         // Draw rotate
-        mAxis.draw(scratch);
-        mEarth.draw(scratch);
+        mAxis.draw(earth);
+        mEarth.draw(earth);
+
+        Matrix.setIdentityM(mMoonMatrix, 0);
+        Matrix.translateM(mMoonMatrix, 0, FloatMath.cos(radian), FloatMath.sin(radian), 0.0f);
+//        Matrix.rotateM(mMoonMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
+        Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
+
+        mMoon.draw(moon);
+
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
 //        Matrix.setRotateM(mRotationMatrix, 0, (mAngle + 180) % 360, 0f, 1f, 0f);
@@ -161,8 +177,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
 //        mPolyStar3D.draw(scratch);
         // Draw a point to indicate the light.
-        GLES20.glUseProgram(mPointProgramHandle);
-        drawLight();
+//        GLES20.glUseProgram(mPointProgramHandle);
+//        drawLight();
     }
 
     @Override
@@ -252,8 +268,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
      */
     private void drawLight()
     {
-        final int pointMVPMatrixHandle = GLES20.glGetUniformLocation(mPointProgramHandle, "u_MVPMatrix");
-        final int pointPositionHandle = GLES20.glGetAttribLocation(mPointProgramHandle, "a_Position");
+        final int pointMVPMatrixHandle = GLES20.glGetUniformLocation(mPointProgramHandle, "uMVPMatrix");
+        final int pointPositionHandle = GLES20.glGetAttribLocation(mPointProgramHandle, "aPosition");
 
         // Pass in the position.
         GLES20.glVertexAttrib3f(pointPositionHandle, mLightPosInModelSpace[0], mLightPosInModelSpace[1], mLightPosInModelSpace[2]);
