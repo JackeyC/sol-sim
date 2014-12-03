@@ -67,6 +67,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
+        // Enable depth testing
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true);
+
         mEarth = new Earth();
         mAxis = new Axis();
         mMoon = new Moon();
@@ -80,6 +85,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Redraw Background colour
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        // Enable depth testing
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true );
 
         float cam_distance = 7f;
 
@@ -99,8 +109,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        i = (i+1)%max;
 //        i = (i-1+max)%max;
 
-        cam_x = cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
-        cam_y = cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_x = -cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_y = -cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_z = cam_distance * FloatMath.sin(mAngle_Y);
 
         //Debug
@@ -146,9 +156,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         int period = 24000;
         long time = SystemClock.uptimeMillis() % period;
         float angle = 360f / period * ((int) time);
-        float radian = angle / MyGLSurfaceView.TwoPi;
+        float radian = MyGLSurfaceView.TwoPi / period * ((int) time);
 
-        Matrix.setRotateM(mEarthTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+        Matrix.setRotateM(mEarthTiltMatrix, 0, 23.45f, 0f, 1f, 0f);
 //        Matrix.setRotateM(mEarthTiltMatrix, 0, 0f, 0f, 1f, 0f);
         Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
 
@@ -158,14 +168,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
+        Matrix.scaleM(earth, 0, 2, 2, 2);
 
         // Draw rotate
         mAxis.draw(earth);
         mEarth.draw(earth);
 
         Matrix.setIdentityM(mMoonMatrix, 0);
-        Matrix.translateM(mMoonMatrix, 0, FloatMath.cos(radian), FloatMath.sin(radian), 0.0f);
-//        Matrix.rotateM(mMoonMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
+        Matrix.rotateM(mMoonMatrix, 0, angle, 0, 0, 1);
+        Matrix.translateM(mMoonMatrix, 0, 3, 0, 0);
         Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
 
         mMoon.draw(moon);
@@ -191,7 +202,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        //frustumM(float[] m, int offset, float left, float right, float bottom, float top, float near, float far)
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 1000);
+//        Matrix.perspectiveM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 1000);
     }
 
 
@@ -217,6 +230,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Use culling to remove back faces.
         GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+//        GLES20.glClearDepthf(1.0f);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         return shader;
     }

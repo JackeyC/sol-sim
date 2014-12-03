@@ -1168,18 +1168,6 @@ public class Moon {
         // Enable a handle to the normals
 //        GLES20.glEnableVertexAttribArray(mNormalHandle);
 
-
-        //  get handle to fragment shader's aLightPosition member
-//        mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
-        // Pass in the light position in eye space.
-//        GLES20.glUniform3f(
-//                mLightPositionHandle, 0f,0f,0f
-//                mLightPosInEyeSpace[0],
-//                mLightPosInEyeSpace[1],
-//                mLightPosInEyeSpace[2]
-//        );
-
-
         // get handle to com.example.android.shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         MyGLRenderer.checkGlError("glGetUniformLocation");
