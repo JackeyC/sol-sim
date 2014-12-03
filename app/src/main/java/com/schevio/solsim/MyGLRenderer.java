@@ -72,7 +72,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         mMoon = new Moon();
         mSpaceShip = new SpaceShip();
     }
-
+// new branch testing
     @Override
     public void onDrawFrame(GL10 unused) {
         float[] earth = new float[16];
