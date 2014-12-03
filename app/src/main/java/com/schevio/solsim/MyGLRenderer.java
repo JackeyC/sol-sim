@@ -149,26 +149,44 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         float radian = angle / MyGLSurfaceView.TwoPi;
 
         Matrix.setRotateM(mEarthTiltMatrix, 0, -23.45f, 0f, 1f, 0f);
+        Matrix.setIdentityM(mEarthTiltMatrix, 0);
+        //Matrix.translateM(mEarthTiltMatrix, 0, FloatMath.cos(radian), FloatMath.sin(radian), 0.0f);
 //        Matrix.setRotateM(mEarthTiltMatrix, 0, 0f, 0f, 1f, 0f);
         Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
+        Matrix.setIdentityM(mRotationMatrix, 0);
+
+//        float [] model = new float[16];
+//        Matrix.setIdentityM(model, 0);
+        float [] scale = new float[16];
+        Matrix.setIdentityM(scale, 0);
+        Matrix.scaleM(scale, 0, 0.5f, 0.5f, 1.5f);
 
         Matrix.multiplyMM(mEarthRotationMatrix, 0, mEarthTiltMatrix, 0, mRotationMatrix, 0);
+        Matrix.multiplyMM(mEarthRotationMatrix, 0, mEarthRotationMatrix, 0, scale, 0);
 
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
 
-        // Draw rotate
-        mAxis.draw(earth);
-        mEarth.draw(earth);
 
         Matrix.setIdentityM(mMoonMatrix, 0);
         Matrix.translateM(mMoonMatrix, 0, FloatMath.cos(radian), FloatMath.sin(radian), 0.0f);
 //        Matrix.rotateM(mMoonMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
         Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
 
-        mMoon.draw(moon);
+//        mMoon.draw(moon);
+        // Draw rotate
+        mAxis.draw(earth);
+        if(FloatMath.sin(radian)>0)
+        {
+            mEarth.draw(earth);
+            mMoon.draw(moon);
+        }else
+        {
+            mMoon.draw(moon);
+            mEarth.draw(earth);
+        }
 
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
@@ -191,7 +209,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        // public static void frustumM (float[] m, int offset, float left, float right, float bottom, float top, float near, float far)
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 10);
     }
 
 
