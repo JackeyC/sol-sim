@@ -19,8 +19,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
 //    private PolyStar3D mPolyStar3D;
-    private Earth mEarth;
     private Axis mAxis;
+    private Sun mSun;
+    private Earth mEarth;
     private Moon mMoon;
     private SpaceShip mSpaceShip;
 
@@ -67,14 +68,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-        mEarth = new Earth();
         mAxis = new Axis();
+        mSun = new Sun();
+        mEarth = new Earth();
         mMoon = new Moon();
         mSpaceShip = new SpaceShip();
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
+        float[] sun = new float[16];
         float[] earth = new float[16];
         float[] moon = new float[16];
 
@@ -148,12 +151,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
-        int Earth_period = 2000;
-        long time = SystemClock.uptimeMillis() % Earth_period;
-        float Earth_day = 360f / Earth_period * ((int) time);
-//        float radian = MyGLSurfaceView.TwoPi / Earth_period * ((int) time);
+        int Earth_day_period = 1000;
+        long time = SystemClock.uptimeMillis() % Earth_day_period;
+        float Earth_day = 360f / Earth_day_period * ((int) time);
+//        float radian = MyGLSurfaceView.TwoPi / Earth_day_period * ((int) time);
 
-        int Moon_period = Earth_period * 27;
+        int Earth_year_period = Earth_day_period * 365;
+        long time2 = SystemClock.uptimeMillis() % Earth_year_period;
+        float Earth_year = 360f / Earth_year_period * ((int) time2);
+
+        int Moon_period = Earth_day_period * 27;
         long time1 = SystemClock.uptimeMillis() % Moon_period;
         float Moon_orbit = 360f / Moon_period * ((int) time1);
 
@@ -168,8 +175,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
         Matrix.scaleM(earth, 0, 3, 3, 3);
-
-        // Draw rotate
         mEarth.draw(earth);
         mAxis.draw(earth);
 
@@ -177,9 +182,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.rotateM(mMoonMatrix, 0, Moon_orbit, 0, 0, 1);
         Matrix.translateM(mMoonMatrix, 0, 5, 0, 0);
         Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
-
         mMoon.draw(moon);
         mAxis.draw(moon);
+
+        Matrix.setIdentityM(mMoonMatrix, 0);
+        Matrix.rotateM(mMoonMatrix, 0, Earth_year, 0, 0, 1);
+        Matrix.translateM(mMoonMatrix, 0, -20, 0, 0);
+        Matrix.multiplyMM(sun, 0, mMVPMatrix, 0, mMoonMatrix, 0);
+        Matrix.scaleM(sun, 0, 5, 5, 5);
+        mSun.draw(sun);
 
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);

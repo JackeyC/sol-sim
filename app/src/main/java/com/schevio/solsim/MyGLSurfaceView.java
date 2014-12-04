@@ -65,4 +65,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         return true;
     }
+
+    public boolean onDoubleTouch(MotionEvent event) {
+
+
+        return true;
+    }
 }
