@@ -42,12 +42,16 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle_X;
     private float mAngle_Y;
 
+    float cam_distance;
     float cam_x;
     float cam_y;
     float cam_z;
     float focus_x;
     float focus_y;
     float focus_z;
+
+    int mSpeed = 1000;
+    int Earth_day_period;
 
     /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
      *  we multiply this by our transformation matrices. */
@@ -89,7 +93,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 //        GLES20.glDepthMask(true );
 
-        float cam_distance = 7f;
+        cam_distance = 7f;
 
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
@@ -110,11 +114,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         cam_x = -cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_y = -cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_z = cam_distance * FloatMath.sin(mAngle_Y);
-
-        //Debug
-//        System.out.println("cam x = " + cam_x);
-//        System.out.println("cam y = " + cam_y);
-//        System.out.println("cam z = " + cam_z);
 
         // Set the camera position
         Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, focus_x, focus_y, focus_z, 0f, 0f, 1f);
@@ -150,8 +149,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Draw static
 //        mSpaceShip.draw(mMVPMatrix);
 
-        // Create a rotation for the shape
-        int Earth_day_period = 1000;
+        if (mSpeed > 0) {
+            Earth_day_period = 3600000 / mSpeed;
+        }
+        else {
+            mSpeed = 1;
+        }
+
         long time = SystemClock.uptimeMillis() % Earth_day_period;
         float Earth_day = 360f / Earth_day_period * ((int) time);
 //        float radian = MyGLSurfaceView.TwoPi / Earth_day_period * ((int) time);
@@ -188,9 +192,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(mMoonMatrix, 0);
         Matrix.rotateM(mMoonMatrix, 0, Earth_year, 0, 0, 1);
         Matrix.translateM(mMoonMatrix, 0, -20, 0, 0);
+        Matrix.rotateM(mMoonMatrix, 0, Moon_orbit, 0, 0, 1);
         Matrix.multiplyMM(sun, 0, mMVPMatrix, 0, mMoonMatrix, 0);
         Matrix.scaleM(sun, 0, 5, 5, 5);
         mSun.draw(sun);
+        mAxis.draw(sun);
 
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
@@ -245,8 +251,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Enable depth testing
 //        GLES20.glClearDepthf(1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-        GLES20.glDepthMask(true);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true);
 
         return shader;
     }
@@ -282,6 +288,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public float getAngle_Y() {
         return mAngle_Y;
     }
+    public int getSpeed() {
+        return mSpeed;
+    }
 
     /**
      * Sets the rotation angle of the triangle com.example.android.shape (mTriangle).
@@ -291,6 +300,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setAngle_Y(float angle_Y) {
         mAngle_Y = angle_Y;
+    }
+    public void setSpeed(int speed) {
+        mSpeed = speed;
     }
 
     /**

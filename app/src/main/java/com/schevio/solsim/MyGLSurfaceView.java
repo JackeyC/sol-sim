@@ -48,9 +48,15 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
-                mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));
-                mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dy * TOUCH_SCALE_FACTOR));
-
+                if (y < 200) {
+                    mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
+                    System.out.println("dx = " + dx);
+                    System.out.println("speed = " + mRenderer.getSpeed());
+                }
+                else {
+                    mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));
+                    mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dy * TOUCH_SCALE_FACTOR));
+                }
                 requestRender();
 
                 //Debug
