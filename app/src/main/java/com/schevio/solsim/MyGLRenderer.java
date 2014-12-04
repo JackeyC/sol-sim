@@ -67,11 +67,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-        // Enable depth testing
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-//        GLES20.glDepthMask(true);
-
         mEarth = new Earth();
         mAxis = new Axis();
         mMoon = new Moon();
@@ -153,14 +148,18 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSpaceShip.draw(mMVPMatrix);
 
         // Create a rotation for the shape
-        int period = 24000;
-        long time = SystemClock.uptimeMillis() % period;
-        float angle = 360f / period * ((int) time);
-        float radian = MyGLSurfaceView.TwoPi / period * ((int) time);
+        int Earth_period = 2000;
+        long time = SystemClock.uptimeMillis() % Earth_period;
+        float Earth_day = 360f / Earth_period * ((int) time);
+//        float radian = MyGLSurfaceView.TwoPi / Earth_period * ((int) time);
+
+        int Moon_period = Earth_period * 27;
+        long time1 = SystemClock.uptimeMillis() % Moon_period;
+        float Moon_orbit = 360f / Moon_period * ((int) time1);
 
         Matrix.setRotateM(mEarthTiltMatrix, 0, 23.45f, 0f, 1f, 0f);
 //        Matrix.setRotateM(mEarthTiltMatrix, 0, 0f, 0f, 1f, 0f);
-        Matrix.setRotateM(mRotationMatrix, 0, angle, 0f, 0f, 1f);
+        Matrix.setRotateM(mRotationMatrix, 0, Earth_day, 0f, 0f, 1f);
 
         Matrix.multiplyMM(mEarthRotationMatrix, 0, mEarthTiltMatrix, 0, mRotationMatrix, 0);
 
@@ -168,18 +167,19 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
-        Matrix.scaleM(earth, 0, 2, 2, 2);
+        Matrix.scaleM(earth, 0, 3, 3, 3);
 
         // Draw rotate
-        mAxis.draw(earth);
         mEarth.draw(earth);
+        mAxis.draw(earth);
 
         Matrix.setIdentityM(mMoonMatrix, 0);
-        Matrix.rotateM(mMoonMatrix, 0, angle, 0, 0, 1);
-        Matrix.translateM(mMoonMatrix, 0, 3, 0, 0);
+        Matrix.rotateM(mMoonMatrix, 0, Moon_orbit, 0, 0, 1);
+        Matrix.translateM(mMoonMatrix, 0, 5, 0, 0);
         Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
 
         mMoon.draw(moon);
+        mAxis.draw(moon);
 
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
@@ -230,6 +230,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Use culling to remove back faces.
         GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+        // Enable depth testing
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true);
 
 //        GLES20.glClearDepthf(1.0f);
 //        GLES20.glEnable(GLES20.GL_DEPTH_TEST);

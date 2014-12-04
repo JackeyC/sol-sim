@@ -41,15 +41,15 @@ public class Axis {
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 3;
     static float squareCoords[] = {
-            0.0f,  0.0f, 2.0f,   // top
-            0.0f,  0.0f, -2.0f,   // bottom
+            0.0f,  0.0f, 1.0f,   // top
+            0.0f,  0.0f, -1.0f,   // bottom
     };
 
     private final short drawOrder[] = { 0, 1 }; // order to draw vertices
 
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
-    float color[] = { 1f, 1f, 1f, 1.0f };
+    float color[] = { 1f, 0f, 0f, 1.0f };
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
