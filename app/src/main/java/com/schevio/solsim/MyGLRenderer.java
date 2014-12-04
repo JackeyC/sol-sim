@@ -232,13 +232,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_CULL_FACE);
 
         // Enable depth testing
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-//        GLES20.glDepthMask(true);
-
 //        GLES20.glClearDepthf(1.0f);
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+        GLES20.glDepthMask(true);
 
         return shader;
     }
