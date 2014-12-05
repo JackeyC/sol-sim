@@ -41,8 +41,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private float mAngle_X;
     private float mAngle_Y;
+    private float mCam_distance = 7f;
 
-    float cam_distance;
     float cam_x;
     float cam_y;
     float cam_z;
@@ -93,8 +93,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 //        GLES20.glDepthMask(true );
 
-        cam_distance = 7f;
-
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
@@ -111,9 +109,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        i = (i+1)%max;
 //        i = (i-1+max)%max;
 
-        cam_x = -cam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
-        cam_y = -cam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
-        cam_z = cam_distance * FloatMath.sin(mAngle_Y);
+        cam_x = -mCam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_y = -mCam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
+        cam_z = mCam_distance * FloatMath.sin(mAngle_Y);
 
         // Set the camera position
         Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, focus_x, focus_y, focus_z, 0f, 0f, 1f);
@@ -250,7 +248,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Enable depth testing
 //        GLES20.glClearDepthf(1.0f);
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 //        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 //        GLES20.glDepthMask(true);
 
@@ -285,11 +283,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public float getAngle_X() {
         return mAngle_X;
     }
+
     public float getAngle_Y() {
         return mAngle_Y;
     }
     public int getSpeed() {
         return mSpeed;
+    }
+    public float getCam_distance() {
+        return mCam_distance;
     }
 
     /**
@@ -304,7 +306,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void setSpeed(int speed) {
         mSpeed = speed;
     }
-
+    public void setCam_distance(float cam_distance) {
+        mCam_distance = cam_distance;
+    }
     /**
      * Draws a point representing the position of the light.
      */

@@ -2,7 +2,9 @@ package com.schevio.solsim;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
 /**
  * Created by chaij on 20/11/14.
@@ -33,12 +35,28 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private float mPreviousX;
     private float mPreviousY;
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+    //public boolean onDoubleTapEvent (MotionEvent e){
+    public boolean onDoubleTapEvent (MotionEvent event){
+
+
+        float x = event.getTouchMinor();
+        float y = event.getTouchMinor();
+        float zoom=0;
+
+
+        System.out.println("zoom = " + zoom);
+
+        return true;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // MotionEvent reports input details from the touch screen
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
-
+        System.out.println("event:"+event.getAction());
         float x = event.getX();
         float y = event.getY();
 
@@ -52,6 +70,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
                     System.out.println("dx = " + dx);
                     System.out.println("speed = " + mRenderer.getSpeed());
+                }
+                if (y > 1000) {
+                    mRenderer.setCam_distance(mRenderer.getCam_distance() + dx);
+                    System.out.println("dx = " + dx);
+                    System.out.println("zoom = " + mRenderer.getCam_distance());
                 }
                 else {
                     mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));
