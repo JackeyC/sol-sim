@@ -16,6 +16,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public MyGLSurfaceView(Context context) {
         super(context);
 
+        SkyBox.mActivityContext = context;
+
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
 
@@ -35,21 +37,18 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private float mPreviousX;
     private float mPreviousY;
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-    //public boolean onDoubleTapEvent (MotionEvent e){
-    public boolean onDoubleTapEvent (MotionEvent event){
-
-
-        float x = event.getTouchMinor();
-        float y = event.getTouchMinor();
-        float zoom=0;
-
-
-        System.out.println("zoom = " + zoom);
-
-        return true;
-    }
+//    public boolean onDoubleTapEvent (MotionEvent event){
+//
+//
+//        float x = event.getTouchMinor();
+//        float y = event.getTouchMinor();
+//        float zoom=0;
+//
+//
+//        System.out.println("zoom = " + zoom);
+//
+//        return true;
+//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -68,11 +67,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                 if (y < 200) {
                     mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
-                    System.out.println("dx = " + dx);
-                    System.out.println("speed = " + mRenderer.getSpeed());
                 }
-                if (y > 1000) {
-                    mRenderer.setCam_distance(mRenderer.getCam_distance() + dx);
+                else if (y > 1000) {
+                    mRenderer.setCam_distance(mRenderer.getCam_distance() + (dx / 10));
                     System.out.println("dx = " + dx);
                     System.out.println("zoom = " + mRenderer.getCam_distance());
                 }
@@ -91,12 +88,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         mPreviousX = x;
         mPreviousY = y;
-
-        return true;
-    }
-
-    public boolean onDoubleTouch(MotionEvent event) {
-
 
         return true;
     }

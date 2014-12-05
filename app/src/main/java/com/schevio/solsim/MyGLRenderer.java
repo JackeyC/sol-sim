@@ -18,7 +18,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float angle;
 
     private static final String TAG = "MyGLRenderer";
-//    private PolyStar3D mPolyStar3D;
+    private SkyBox mSkyBox;
     private Axis mAxis;
     private Sun mSun;
     private Earth mEarth;
@@ -72,6 +72,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
+        mSkyBox = new SkyBox();
         mAxis = new Axis();
         mSun = new Sun();
         mEarth = new Earth();
@@ -81,17 +82,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+        float[] SkyBox = new float[16];
         float[] sun = new float[16];
         float[] earth = new float[16];
         float[] moon = new float[16];
 
-        // Redraw Background colour
+        // Clear color and depth buffer
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        // Enable depth testing
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-//        GLES20.glDepthMask(true );
 
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
@@ -145,6 +142,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         // Draw static
+        Matrix.scaleM(SkyBox, 0, mMVPMatrix, 0, 200, 200, 200);
+        mSkyBox.draw(SkyBox);
 //        mSpaceShip.draw(mMVPMatrix);
 
         if (mSpeed > 0) {
@@ -205,6 +204,15 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Draw a point to indicate the light.
 //        GLES20.glUseProgram(mPointProgramHandle);
 //        drawLight();
+
+        // Use culling to remove back faces.
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
+
+        // Enable depth testing
+//        GLES20.glClearDepthf(1.0f);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true);
     }
 
     @Override
@@ -221,7 +229,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 1000);
 //        Matrix.perspectiveM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 1000);
     }
-
 
     /**
      * Utility method for compiling a OpenGL shader.
@@ -242,16 +249,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // add the source code to the shader and compile it
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
-
-        // Use culling to remove back faces.
-        GLES20.glEnable(GLES20.GL_CULL_FACE);
-
-        // Enable depth testing
-//        GLES20.glClearDepthf(1.0f);
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-//        GLES20.glDepthMask(true);
-
         return shader;
     }
 
