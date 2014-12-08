@@ -2,9 +2,7 @@ package com.schevio.solsim;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 
 /**
  * Created by chaij on 20/11/14.
@@ -56,6 +54,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
         System.out.println("event:"+event.getAction());
+
+        int ScreenWidth = getWidth();
+        int ScreenHeight = getHeight();
+
         float x = event.getX();
         float y = event.getY();
 
@@ -65,13 +67,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
-                if (y < 200) {
+                if (y < ScreenHeight * 0.15) {
                     mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
+                    System.out.println("height = " + ScreenHeight);
                 }
-                else if (y > 1000) {
+                else if (y > ScreenHeight * 0.85) {
                     mRenderer.setCam_distance(mRenderer.getCam_distance() + (dx / 10));
-                    System.out.println("dx = " + dx);
-                    System.out.println("zoom = " + mRenderer.getCam_distance());
+                    System.out.println("height = " + ScreenHeight);
                 }
                 else {
                     mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));

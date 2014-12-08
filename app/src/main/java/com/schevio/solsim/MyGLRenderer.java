@@ -90,6 +90,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Clear color and depth buffer
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
+        // Enable depth testing
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+//        GLES20.glDepthMask(true );
+
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
@@ -143,7 +148,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Draw static
         Matrix.scaleM(SkyBox, 0, mMVPMatrix, 0, 200, 200, 200);
-        mSkyBox.draw(SkyBox);
+//        mSkyBox.draw(SkyBox);
 //        mSpaceShip.draw(mMVPMatrix);
 
         if (mSpeed > 0) {
