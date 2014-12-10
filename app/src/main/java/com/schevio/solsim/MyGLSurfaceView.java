@@ -31,7 +31,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public static float TwoPi = 2 * Pi;
     public static float HalfPi = Pi / 2;
 
-    private final float TOUCH_SCALE_FACTOR = Pi / 720;
     private float mPreviousX;
     private float mPreviousY;
 
@@ -53,7 +52,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // MotionEvent reports input details from the touch screen
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
-        System.out.println("event:"+event.getAction());
+//        System.out.println("event:"+event.getAction());
 
         int ScreenWidth = getWidth();
         int ScreenHeight = getHeight();
@@ -69,15 +68,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                 if (y < ScreenHeight * 0.15) {
                     mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
-                    System.out.println("height = " + ScreenHeight);
                 }
                 else if (y > ScreenHeight * 0.85) {
                     mRenderer.setCam_distance(mRenderer.getCam_distance() + (dx / 10));
-                    System.out.println("height = " + ScreenHeight);
                 }
                 else {
-                    mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * TOUCH_SCALE_FACTOR));
-                    mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dy * TOUCH_SCALE_FACTOR));
+                    mRenderer.setAngle_X(mRenderer.getAngle_X() + (dx * Pi / ScreenWidth));
+                    mRenderer.setAngle_Y(mRenderer.getAngle_Y() + (dy * Pi / ScreenWidth));
                 }
                 requestRender();
 

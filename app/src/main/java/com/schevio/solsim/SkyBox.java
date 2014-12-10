@@ -17,16 +17,16 @@ public class SkyBox {
 
                     + "attribute vec4 vPosition;        \n"		// Per-vertex position information we will pass in.
                     + "attribute vec4 aColor;           \n"		// Per-vertex color information we will pass in.
-                    + "attribute vec2 aTexture;         \n"     // Per-vertex texture coordinate information we will pass in
+//                    + "attribute vec2 aTexture;         \n"     // Per-vertex texture coordinate information we will pass in
 
                     + "varying vec4 vColor;             \n"		// This will be passed into the fragment shader.
-                    + "varying vec2 vTexture;           \n"     // This will be passed into the fragment shader.
+//                    + "varying vec2 vTexture;           \n"     // This will be passed into the fragment shader.
 
                     + "void main() {        \n"
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;              \n"     // Pass through the color.
-                    + "   vTexture = aTexture           \n"     // Pass through the texture coordinate.
+//                    + "   vTexture = aTexture           \n"     // Pass through the texture coordinate.
 
                     // gl_Position is a special variable used to store the final position.
                     // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
@@ -39,11 +39,11 @@ public class SkyBox {
                     + "varying vec4 vColor;             \n"		// This is the color from the vertex shader interpolated across the triangle per fragment.
 
                     + "uniform sampler2D uTextureImage; \n"     // The input texture.
-                    + "varying vec2 vTexture;           \n"     // Interpolated texture coordinate per fragment.
+//                    + "varying vec2 vTexture;           \n"     // Interpolated texture coordinate per fragment.
 
                     + "void main()                      \n"		// The entry point for our fragment shader.
                     + "{                                \n"
-                    + "   gl_FragColor = vColor * texture2D(uTextureImage, vTexture);        \n"		// Pass the color and texture directly through the pipeline.
+                    + "   gl_FragColor = vColor; "//* texture2D(uTextureImage, vTexture);        \n"		// Pass the color and texture directly through the pipeline.
                     + "}                                \n";
 
     private final FloatBuffer vertexBuffer;
@@ -301,33 +301,33 @@ public class SkyBox {
 
 
         // get handle to fragment shader's aNormal member
-        mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTexture");
+//        mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTexture");
 //        // Pass in the normal information
-        textureBuffer.position(0);
-        GLES20.glVertexAttribPointer(
-                mTextureHandle,
-                2,
-                GLES20.GL_FLOAT,
-                false,
-                0,
-                textureBuffer
-        );
-        // Enable a handle to the normals
-        GLES20.glEnableVertexAttribArray(mTextureHandle);
-
-        mTextureImageHandle = GLES20.glGetUniformLocation(mProgram, "uTextureImage");
-
-        // Load the texture
-        mTextureDataHandle = TextureHelper.loadTexture(mActivityContext, R.drawable.ic_launcher);
-
-        // Set the active texture unit to texture unit 0.
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-
-        // Bind the texture to this unit.
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureDataHandle);
-
-        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
-        GLES20.glUniform1i(mTextureImageHandle, 0);
+//        textureBuffer.position(0);
+//        GLES20.glVertexAttribPointer(
+//                mTextureHandle,
+//                2,
+//                GLES20.GL_FLOAT,
+//                false,
+//                0,
+//                textureBuffer
+//        );
+//        // Enable a handle to the normals
+//        GLES20.glEnableVertexAttribArray(mTextureHandle);
+//
+//        mTextureImageHandle = GLES20.glGetUniformLocation(mProgram, "uTextureImage");
+//
+//        //Load the texture
+//        mTextureDataHandle = TextureHelper.loadTexture(mActivityContext, R.drawable.ic_launcher);
+//
+//        // Set the active texture unit to texture unit 0.
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+//
+//        // Bind the texture to this unit.
+//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureDataHandle);
+//
+//        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
+//        GLES20.glUniform1i(mTextureImageHandle, 0);
 
         // get handle to com.example.android.shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

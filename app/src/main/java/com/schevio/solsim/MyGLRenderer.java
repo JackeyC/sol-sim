@@ -50,7 +50,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float focus_y;
     float focus_z;
 
-    int mSpeed = 1000;
+    int mSpeed = 1;
     int Earth_day_period;
 
     /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
@@ -90,11 +90,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Clear color and depth buffer
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        // Enable depth testing
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-//        GLES20.glDepthMask(true );
-
         if (mAngle_X <= -MyGLSurfaceView.TwoPi | mAngle_X >= MyGLSurfaceView.TwoPi) {
             mAngle_X = 0;
         }
@@ -111,37 +106,18 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        i = (i+1)%max;
 //        i = (i-1+max)%max;
 
+        if (mCam_distance <= 3f){
+            mCam_distance = 3f;
+        }
+        if (mCam_distance >= 80f){
+            mCam_distance = 80f;
+        }
         cam_x = -mCam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_y = -mCam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_z = mCam_distance * FloatMath.sin(mAngle_Y);
 
         // Set the camera position
         Matrix.setLookAtM(mViewMatrix, 0, cam_x, cam_y, cam_z, focus_x, focus_y, focus_z, 0f, 0f, 1f);
-
-        // Define a simple shader program for our point.
-//        final String pointVertexShader =
-//                "uniform mat4 u_MVPMatrix;      \n"
-//                        +	"attribute vec4 aPosition;     \n"
-//                        + "void main()                    \n"
-//                        + "{                              \n"
-//                        + "   gl_Position = uMVPMatrix * aPosition;   \n"
-//                        + "   gl_PointSize = 5.0;         \n"
-//                        + "}                              \n";
-//
-//        final String pointFragmentShader =
-//                "precision mediump float;       \n"
-//                        + "void main()                    \n"
-//                        + "{                              \n"
-//                        + "   gl_FragColor = vec4(1.0,    \n"
-//                        + "   1.0, 1.0, 1.0);             \n"
-//                        + "}                              \n";
-
-//        final int pointVertexShaderHandle = compileShader(GLES20.GL_VERTEX_SHADER, pointVertexShader);
-//        final int pointFragmentShaderHandle = compileShader(GLES20.GL_FRAGMENT_SHADER, pointFragmentShader);
-//        mPointProgramHandle = createAndLinkProgram(pointVertexShaderHandle, pointFragmentShaderHandle,
-//                new String[] {"a_Position"});
-
-//        final String vertexShader = getVertexShader();
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
@@ -158,9 +134,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             mSpeed = 1;
         }
 
-        long time = SystemClock.uptimeMillis() % Earth_day_period;
-        float Earth_day = 360f / Earth_day_period * ((int) time);
-//        float radian = MyGLSurfaceView.TwoPi / Earth_day_period * ((int) time);
+        long time = SystemClock.uptimeMillis() % 3600000;
+        float rotation_scale = 360f / 3600000 * ((int) time);
+        float Earth_day = mSpeed * rotation_scale;
+        float radian = MyGLSurfaceView.TwoPi / Earth_day_period * ((int) time);
 
         int Earth_year_period = Earth_day_period * 365;
         long time2 = SystemClock.uptimeMillis() % Earth_year_period;
@@ -170,35 +147,34 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         long time1 = SystemClock.uptimeMillis() % Moon_period;
         float Moon_orbit = 360f / Moon_period * ((int) time1);
 
-        Matrix.setRotateM(mEarthTiltMatrix, 0, 23.45f, 0f, 1f, 0f);
-//        Matrix.setRotateM(mEarthTiltMatrix, 0, 0f, 0f, 1f, 0f);
-        Matrix.setRotateM(mRotationMatrix, 0, Earth_day, 0f, 0f, 1f);
-
-        Matrix.multiplyMM(mEarthRotationMatrix, 0, mEarthTiltMatrix, 0, mRotationMatrix, 0);
-
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, mEarthRotationMatrix, 0);
-        Matrix.scaleM(earth, 0, 3, 3, 3);
-        mEarth.draw(earth);
-        mAxis.draw(earth);
 
-        Matrix.setIdentityM(mMoonMatrix, 0);
-        Matrix.rotateM(mMoonMatrix, 0, Moon_orbit, 0, 0, 1);
-        Matrix.translateM(mMoonMatrix, 0, 5, 0, 0);
-        Matrix.multiplyMM(moon, 0, mMVPMatrix, 0, mMoonMatrix, 0);
-        mMoon.draw(moon);
-        mAxis.draw(moon);
-
-        Matrix.setIdentityM(mMoonMatrix, 0);
-        Matrix.rotateM(mMoonMatrix, 0, Earth_year, 0, 0, 1);
-        Matrix.translateM(mMoonMatrix, 0, -20, 0, 0);
-        Matrix.rotateM(mMoonMatrix, 0, Moon_orbit, 0, 0, 1);
-        Matrix.multiplyMM(sun, 0, mMVPMatrix, 0, mMoonMatrix, 0);
+        Matrix.setIdentityM(sun, 0);
+        Matrix.rotateM(sun, 0, Moon_orbit, 0, 0, 1);
         Matrix.scaleM(sun, 0, 5, 5, 5);
+        Matrix.multiplyMM(sun, 0, mMVPMatrix, 0, sun, 0);
         mSun.draw(sun);
         mAxis.draw(sun);
+
+        Matrix.setIdentityM(earth, 0);
+        Matrix.setIdentityM(moon, 0);
+        Matrix.rotateM(earth, 0, Earth_year, 0, 0, 1);
+        Matrix.translateM(earth, 0, -20, 0, 0);
+
+        Matrix.rotateM(moon, 0, earth, 0, Moon_orbit, 0, 0, 1);
+        Matrix.translateM(moon, 0, 5, 0, 0);
+
+        Matrix.rotateM(earth, 0, -Earth_year, 0, 0, 1);
+        Matrix.rotateM(earth, 0, 23.45f, 0f, 1f, 0f);
+        Matrix.rotateM(earth, 0, Earth_day, 0f, 0f, 1f);
+        Matrix.scaleM(earth, 0, 3, 3, 3);
+        Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, earth, 0);
+        mEarth.draw(earth);
+        mAxis.draw(earth);
+        mMoon.draw(moon);
+        mAxis.draw(moon);
 
 //        mSpaceShip.draw(scratch);
 //        mPolyStar3D.draw(scratch);
