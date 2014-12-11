@@ -46,11 +46,11 @@ public class Earth {
 //                    + "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);       \n"
 
                     // Attenuate the light based on distance.
-//                    + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
+//                    + "   diffuse = diffuse * (1.0 / (1.0 + (0.025 * distance * distance)));  \n"
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
-//                    + "   vColor = aColor;                                                \n"
-                    + "   vColor = 0.75*aColor + 0.5*aPosition;       \n"
+                    + "   vColor = aColor;                                                \n"
+//                    + "   vColor = 0.75*aColor + 0.5*aPosition;       \n"
 //                    + "   if(abs(aPosition.z)>0.4) vColor.b=0;                                  \n"
 //                    + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
 //                    + "   if(abs(aPosition.z)<0.1) vColor.ra=vec2(1,1);                                  \n"
@@ -61,15 +61,15 @@ public class Earth {
 
                     // lighting per vertex
                     // http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/directional-lights/
-                    +"vec3 l_dir = uLightPosition-(uMVMatrix * vec4(aPosition.xyz,1)).xyz; \n"
+//                    +"vec3 l_dir = uLightPosition-(uMVMatrix * vec4(aPosition.xyz,1)).xyz; \n"
                     // transform normal to camera space and normalize it
-                    +"vec3 n = normalize(uMVMatrix * vec4(aNormal,1)).xyz; \n"
+//                    +"vec3 n = normalize(uMVMatrix * vec4(aNormal,1)).xyz; \n"
                     // compute the intensity as the dot product
                     // the max prevents negative intensity values
-                    +"float intensity = max(dot(n, l_dir), 0.25); \n"
-                    +"vec4 diffuse = vColor; \n"
+//                    +"float intensity = max(dot(n, l_dir), 0.25); \n"
+//                    +"vec4 diffuse = vColor; \n"
                     // Compute the color per vertex
-                    +"vColor = intensity * diffuse; \n"
+//                    +"vColor = intensity * diffuse; \n"
 //                    + "   vColor = 0.75*aColor + 0.5*(uMVMatrix*aPosition-aPosition);                         \n"
                     + "}                                                                   \n";
 
@@ -95,7 +95,7 @@ public class Earth {
     private int mPositionHandle;
     private int mColorHandle;
     private int mNormalHandle;
-//    private int mLightPositionHandle;
+    private int mLightPositionHandle;
     private int mMVPMatrixHandle;
 
     /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
@@ -266,13 +266,8 @@ public class Earth {
         // Enable a handle to the vertices
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
-
-//        float LightPosition[] = {
-//            8f, 0f, 0f
-//        };
-
 //        get handle to fragment shader's aColor member
-        int mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
+        mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
 //        Set color for drawing the shape
         GLES20.glUniform3fv(mLightPositionHandle, 1, l_pos, 0);
 

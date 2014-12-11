@@ -150,8 +150,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         if (mCam_distance <= 3f) {
             mCam_distance = 3f;
         }
-        if (mCam_distance >= 80f) {
-            mCam_distance = 80f;
+        if (mCam_distance >= 100f) {
+            mCam_distance = 100f;
         }
 
 //        if (mPlanet > 3) {
@@ -197,11 +197,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSkyBox.draw(SkyBox);
 //        mSpaceShip.draw(mMVPMatrix);
 
-        Matrix.setIdentityM(starsDome, 0);
-        Matrix.translateM(starsDome, 0, focus_x, focus_y, focus_z);
-        Matrix.scaleM(starsDome, 0, 500, 500, 500);
-        Matrix.multiplyMM(starsDome, 0, mMVPMatrix, 0, starsDome, 0);
-        mStarsDome.draw(starsDome);
+//        Matrix.setIdentityM(starsDome, 0);
+//        Matrix.translateM(starsDome, 0, focus_x, focus_y, focus_z);
+//        Matrix.scaleM(starsDome, 0, 500, 500, 500);
+//        Matrix.multiplyMM(starsDome, 0, mMVPMatrix, 0, starsDome, 0);
+//        mStarsDome.draw(starsDome);
 
         if (mSpeed > 0) {
             Earth_day_period = 3600000 / mSpeed;
@@ -224,9 +224,9 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         float Moon_orbit_radian = MyGLSurfaceView.TwoPi / Moon_period * ((int) time3);
 
         int Saturn_period = Earth_year_period * 29;
-        long time4 = SystemClock.uptimeMillis() % Moon_period;
+        long time4 = SystemClock.uptimeMillis() % Saturn_period;
         float Saturn_year = 360f / Saturn_period * ((int) time4);
-        float Saturn_year_radian = MyGLSurfaceView.TwoPi / Moon_period * ((int) time4);
+        float Saturn_year_radian = MyGLSurfaceView.TwoPi / Saturn_period * ((int) time4);
 
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order

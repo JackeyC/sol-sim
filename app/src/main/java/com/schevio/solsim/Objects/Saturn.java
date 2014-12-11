@@ -51,9 +51,9 @@ public class Saturn {
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;                                       \n"
 //                    + "   vColor = aColor + 0.25*vPosition;                           \n"
-                    + "   if(abs(aPosition.z)>0.4) vColor.b=0;                                  \n"
-                    + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
-                    + "   if(abs(aPosition.z)<0.1) vColor.ra=vec2(1,1);                                  \n"
+                    + "   if(abs(aPosition.z) > 0.3) vColor.b=0;                                  \n"
+                    + "   if(abs(aPosition.z) > 0.2 && abs(aPosition.z) <= 0.3) vColor*=1.5;                                  \n"
+                    + "   if(abs(aPosition.z) <= 0.2) vColor.ra=vec2(1,1);                                  \n"
                     + "   vPosition = aPosition;                                  \n"
                     // gl_Position is a special variable used to store the final position.
                     // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
@@ -121,9 +121,9 @@ public class Saturn {
         for (int i = 0; i < shape_faces * 3; i++) {
             int n = random.nextInt(2);
             if (n == 0) {
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.1f;
+                Colors[idx++] = 0.4f;
+                Colors[idx++] = 0.4f;
+                Colors[idx++] = 0.0f;
                 Colors[idx++] = 1.0f;
             }
             else {
