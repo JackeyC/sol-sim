@@ -1,4 +1,4 @@
-package com.schevio.solsim;
+package com.schevio.solsim.Objects;
 /** 
  * Created by chaij with objcov.pl.
 source file    : ./icosphere-div3.obj

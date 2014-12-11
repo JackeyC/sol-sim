@@ -1,16 +1,32 @@
-package com.schevio.solsim;
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.schevio.solsim.Objects;
 
 import android.opengl.GLES20;
+
+import com.schevio.solsim.MyGLRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 /**
- * A two-dimensional square for use as a drawn object in OpenGL ES 2.0.
+ * A two-dimensional polygon for use as a drawn object in OpenGL ES 2.0.
  */
-public class Axis {
+public class Saturn_Ring {
 
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
@@ -18,7 +34,7 @@ public class Axis {
             "uniform mat4 uMVPMatrix;" +
                     "attribute vec4 vPosition;" +
                     "void main() {" +
-                    // The matrix must be included as a modifier of gl_Position.
+                    // the matrix must be included as a modifier of gl_Position
                     // Note that the uMVPMatrix factor *must be first* in order
                     // for the matrix multiplication product to be correct.
                     "  gl_Position = uMVPMatrix * vPosition;" +
@@ -32,59 +48,90 @@ public class Axis {
                     "}";
 
     private final FloatBuffer vertexBuffer;
-    private final ShortBuffer drawListBuffer;
     private final int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
 
     // number of coordinates per vertex in this array
-    static final int COORDS_PER_VERTEX = 3;
-    static float squareCoords[] = {
-            0.0f,  0.0f, 1.0f,   // top
-            0.0f,  0.0f, -1.0f,   // bottom
-    };
+    static final int COORDS_PER_VERTEX = 2;
 
-    private final short drawOrder[] = { 0, 1 }; // order to draw vertices
+    int Star_vertex = 30;
+    float radius = 1.0f;
+    float inner_radius = 0.8f;
 
+    float color[] = { 0.9f, 0.8f, 0.2f, 0.0f };
+
+    private final int vertexCount = Star_vertex * 2 + 2;
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
-    float color[] = { 1f, 0f, 0f, 1.0f };
+    float vertexCoords[] = new float[vertexCount*2 + 4];
+    int idx = 0;
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public Axis() {
+    public Saturn_Ring() {
+//        vertexCoords[idx++] = center_x;
+//        vertexCoords[idx++] = center_y;
+
+        int outerVertexCount = vertexCount - 2;
+        boolean outer_vertex = true;
+
+        for (int i = 0; i < outerVertexCount; i++) {
+            float percent = (i / (float) (outerVertexCount - 1));
+            float rad = (float) (percent * 2 * Math.PI);
+            float outer_x;
+            float outer_y;
+
+            if (outer_vertex) {
+                outer_x = (float) (radius * Math.sin(rad));
+                outer_y = (float) (radius * Math.cos(rad));
+                outer_vertex = false;
+            }
+            else {
+                outer_x = (float) (inner_radius * Math.sin(rad));
+                outer_y = (float) (inner_radius * Math.cos(rad));
+                outer_vertex = true;
+            }
+
+            vertexCoords[idx++] = outer_x;
+            vertexCoords[idx++] = outer_y;
+        }
+        vertexCoords[idx++] = vertexCoords[0];
+        vertexCoords[idx++] = vertexCoords[1];
+//        vertexCoords[idx++] = vertexCoords[2];
+//        vertexCoords[idx++] = vertexCoords[3];
+
         // initialize vertex byte buffer for com.example.android.shape coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(
-                // (# of coordinate values * 4 bytes per float)
-                squareCoords.length * 4);
+                // (number of coordinate values * 4 bytes per float)
+                vertexCoords.length * 4);
+        // use the device hardware's native byte order
         bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareCoords);
-        vertexBuffer.position(0);
 
-        // initialize byte buffer for the draw list
-        ByteBuffer dlb = ByteBuffer.allocateDirect(
-                // (# of coordinate values * 2 bytes per short)
-                drawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(drawOrder);
-        drawListBuffer.position(0);
+        // create a floating point buffer from the ByteBuffer
+        vertexBuffer = bb.asFloatBuffer();
+        // add the coordinates to the FloatBuffer
+        vertexBuffer.put(vertexCoords);
+        // set the buffer to read the first coordinate
+        vertexBuffer.position(0);
 
         // prepare shaders and OpenGL program
         int vertexShader = MyGLRenderer.loadShader(
                 GLES20.GL_VERTEX_SHADER,
-                vertexShaderCode);
+                vertexShaderCode
+        );
         int fragmentShader = MyGLRenderer.loadShader(
                 GLES20.GL_FRAGMENT_SHADER,
-                fragmentShaderCode);
+                fragmentShaderCode
+        );
 
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
         GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
+
     }
 
     /**
@@ -123,10 +170,16 @@ public class Axis {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         MyGLRenderer.checkGlError("glUniformMatrix4fv");
 
-        // Draw the square
-        GLES20.glDrawElements(
-                GLES20.GL_LINES, drawOrder.length,
-                GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+        GLES20.glDisable(GLES20.GL_CULL_FACE);
+
+        // Draw the Polygon
+        GLES20.glDrawArrays(
+                GLES20.GL_TRIANGLE_STRIP, 0, vertexCount
+//                GLES20.GL_LINE_LOOP, 2, vertexCount
+//                GLES20.GL_LINE_STRIP, 0, vertexCount
+        );
+
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);

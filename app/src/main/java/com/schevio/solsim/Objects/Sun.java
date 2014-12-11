@@ -1,13 +1,15 @@
-package com.schevio.solsim;
+package com.schevio.solsim.Objects;
 
 import android.opengl.GLES20;
+
+import com.schevio.solsim.MyGLRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Random;
 
-public class Moon {
+public class Sun {
 
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
@@ -98,74 +100,49 @@ public class Moon {
 
     static float Normals[] = Icosphere.Normals;
 
+//    static float Colors[] = {
+            // f 1//1 14//1 13//1
+//            1.0f, 0.5f, 0.0f, 0.0f,
+//            1.0f, 0.6f, 0.2f, 0.0f,
+//            1.0f, 1.0f, 0.0f, 0.0f,
+
     private final int vertexCount = Vertices.length / COORDS_PER_VERTEX;
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public Moon() {
+    public Sun() {
         Random random = new Random();
 
-        for (int i = 0; i < shape_faces; i++) {
+        for (int i = 0; i < shape_faces * 3; i++) {
             int n = random.nextInt(40);
-            boolean white = true;
 
-            if (n < 15 | white & n < 20) {
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
+            if (n < 2) {
                 Colors[idx++] = 1.0f;
-
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 1.0f;
-
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
-                Colors[idx++] = 0.7f;
+                Colors[idx++] = 0.0f;
+                Colors[idx++] = 0.0f;
                 Colors[idx++] = 1.0f;
             }
-
-            else if (n < 35) {
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
+            else if (n < 10) {
                 Colors[idx++] = 1.0f;
-
                 Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
+                Colors[idx++] = 0.0f;
                 Colors[idx++] = 1.0f;
-
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
-                Colors[idx++] = 0.5f;
+            }
+            else if (n < 20) {
                 Colors[idx++] = 1.0f;
-
-                white = false;
+                Colors[idx++] = 0.6f;
+                Colors[idx++] = 0.2f;
+                Colors[idx++] = 1.0f;
             }
             else {
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
                 Colors[idx++] = 1.0f;
-
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
                 Colors[idx++] = 1.0f;
-
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
-                Colors[idx++] = 0.3f;
+                Colors[idx++] = 0.0f;
                 Colors[idx++] = 1.0f;
-
-                white = false;
             }
         }
-
         // initialize vertex byte buffer for object
         ByteBuffer bb = ByteBuffer.allocateDirect(Vertices.length * 4);   // (# of coordinate values * 4 bytes per float)
         bb.order(ByteOrder.nativeOrder());
@@ -262,6 +239,18 @@ public class Moon {
 //        );
         // Enable a handle to the normals
 //        GLES20.glEnableVertexAttribArray(mNormalHandle);
+
+
+        //  get handle to fragment shader's aLightPosition member
+//        mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
+        // Pass in the light position in eye space.
+//        GLES20.glUniform3f(
+//                mLightPositionHandle, 0f,0f,0f
+//                mLightPosInEyeSpace[0],
+//                mLightPosInEyeSpace[1],
+//                mLightPosInEyeSpace[2]
+//        );
+
 
         // get handle to com.example.android.shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

@@ -1,7 +1,9 @@
-package com.schevio.solsim;
+package com.schevio.solsim.Objects;
 
 import android.content.Context;
 import android.opengl.GLES20;
+
+import com.schevio.solsim.MyGLRenderer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

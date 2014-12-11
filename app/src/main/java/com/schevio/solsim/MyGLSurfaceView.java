@@ -14,7 +14,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public MyGLSurfaceView(Context context) {
         super(context);
 
-        SkyBox.mActivityContext = context;
+//        SkyBox.mActivityContext = context;
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
@@ -57,8 +57,33 @@ public class MyGLSurfaceView extends GLSurfaceView {
         int ScreenWidth = getWidth();
         int ScreenHeight = getHeight();
 
+        float ScreenLeft = ScreenWidth * 0.15f;
+        float ScreenRight = ScreenWidth * 0.85f;
+        float ScreenTop = ScreenHeight * 0.15f;
+        float ScreenBottom = ScreenHeight * 0.85f;
+
         float x = event.getX();
         float y = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if (y < ScreenTop & x < ScreenLeft) {
+                    System.out.println("top left");
+//                    mRenderer.setSpeed(mRenderer.getSpeed());
+                }
+                else if (y < ScreenTop & x > ScreenRight) {
+                    System.out.println("top right");
+                    mRenderer.setAxis(!mRenderer.getAxis());
+                }
+                if (y > ScreenBottom & x < ScreenLeft) {
+                    System.out.println(" bottom left");
+                    mRenderer.setPlanet(mRenderer.getPlanet() - 1);
+                }
+                else if (y > ScreenBottom & x >ScreenRight) {
+                    System.out.println("bottom right");
+                    mRenderer.setPlanet(mRenderer.getPlanet() + 1);
+                }
+        }
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
@@ -66,10 +91,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
-                if (y < ScreenHeight * 0.15) {
+                if (y < ScreenTop) {
                     mRenderer.setSpeed((int) (mRenderer.getSpeed() + (dx * 50)));
                 }
-                else if (y > ScreenHeight * 0.85) {
+                else if (y > ScreenBottom) {
                     mRenderer.setCam_distance(mRenderer.getCam_distance() + (dx / 10));
                 }
                 else {
