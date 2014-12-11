@@ -154,28 +154,33 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             mCam_distance = 80f;
         }
 
-        if (mPlanet > 3) {
-            mPlanet = 0;
-        }
-        if (mPlanet < 0) {
-            mPlanet = 3;
-        }
-        if (mPlanet == 0) {
-            focus_x = Sun_x;
-            focus_y = Sun_y;
-        }
-        if (mPlanet == 1) {
-            focus_x = Earth_x;
-            focus_y = Earth_y;
-        }
-        if (mPlanet == 2) {
-            focus_x = Moon_x;
-            focus_y = Moon_y;
-        }
-        if (mPlanet == 3) {
-            focus_x = Saturn_x;
-            focus_y = Saturn_y;
-        }
+//        if (mPlanet > 3) {
+//            mPlanet = 0;
+//        }
+//        if (mPlanet < 0) {
+//            mPlanet = 3;
+//        }
+//        if (mPlanet == 0) {
+//            focus_x = Sun_x;
+//            focus_y = Sun_y;
+//        }
+//        if (mPlanet == 1) {
+//            focus_x = Earth_x;
+//            focus_y = Earth_y;
+//        }
+//        if (mPlanet == 2) {
+//            focus_x = Moon_x;
+//            focus_y = Moon_y;
+//        }
+//        if (mPlanet == 3) {
+//            focus_x = Saturn_x;
+//            focus_y = Saturn_y;
+//        }
+
+        float xs[]={Sun_x, Earth_x, Moon_x, Saturn_x};
+        float ys[]={Sun_y, Earth_y, Moon_y, Saturn_y};
+        focus_x = xs[getPlanet()];
+        focus_y = ys[getPlanet()];
 
         cam_x = focus_x - mCam_distance * FloatMath.sin(mAngle_X) * FloatMath.cos(mAngle_Y);
         cam_y = focus_y - mCam_distance * FloatMath.cos(mAngle_X) * FloatMath.cos(mAngle_Y);
@@ -242,13 +247,22 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(sun, 0, mMVPMatrix, 0, sun, 0);
         mSun.draw(sun);
 
+       // public static void multiplyMV (float[] resultVec, int resultVecOffset, float[] lhsMat, int lhsMatOffset, float[] rhsVec, int rhsVecOffset)
+        float l_pos [] = {0, 0, 0, 1};
+        float [] sunModelViewMatrix = new float[16];
+        Matrix.multiplyMM(sunModelViewMatrix, 0, mViewMatrix, 0, sun, 0);
+        Matrix.multiplyMV(l_pos, 0, sunModelViewMatrix, 0, l_pos, 0);
+
         Matrix.setIdentityM(earth, 0);
         Matrix.translateM(earth, 0, Earth_x, Earth_y, 0);
         Matrix.rotateM(earth, 0, 23.45f, 0f, 1f, 0f);
         Matrix.rotateM(earth, 0, Earth_day, 0f, 0f, 1f);
         Matrix.scaleM(earth, 0, 3, 3, 3);
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, earth, 0);
-        mEarth.draw(earth);
+//        mEarth.draw(earth);
+        float[] earthModelViewMatrix = new float[16];
+        Matrix.multiplyMM(earthModelViewMatrix, 0, mViewMatrix, 0, earth, 0);
+        mEarth.draw(earth, earthModelViewMatrix, l_pos);
 
         Matrix.setIdentityM(moon, 0);
         Matrix.translateM(moon, 0, Moon_x, Moon_y, 0);
@@ -385,8 +399,23 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         mCam_distance = cam_distance;
     }
 
+    public int getNumOfPlanet()
+    {
+        return 4;
+    }
+
+    public  void nextPlanet()
+    {
+        mPlanet = (mPlanet + 1) % getNumOfPlanet();
+    }
+
+    public  void previousPlanet()
+    {
+        mPlanet = (mPlanet - 1 + getNumOfPlanet()) % getNumOfPlanet();
+    }
+
     public void setPlanet(int planet) {
-        mPlanet = planet;
+        mPlanet = (planet + getNumOfPlanet()) % getNumOfPlanet();
     }
 
     public void setOrbits(boolean orbits) {

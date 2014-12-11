@@ -16,7 +16,7 @@ public class Earth {
             // the coordinates of the objects that use this vertex shader
             "uniform mat4 uMVPMatrix;      \n"		// A constant representing the combined model/view/projection matrix.
                     + "uniform mat4 uMVMatrix;       \n"		// A constant representing the combined model/view matrix.
-//                    + "uniform vec3 uLightPosition;       \n"	    // The position of the light in eye space.
+                    + "uniform vec3 uLightPosition;       \n"	    // The position of the light in eye space.
 
                     + "attribute vec4 aPosition;     \n"		// Per-vertex position information we will pass in.
                     + "attribute vec4 aColor;        \n"		// Per-vertex color information we will pass in.
@@ -49,7 +49,8 @@ public class Earth {
 //                    + "   diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));  \n"
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
-                    + "   vColor = aColor;                                       \n"
+//                    + "   vColor = aColor;                                                \n"
+                    + "   vColor = 0.75*aColor + 0.5*aPosition;       \n"
 //                    + "   if(abs(aPosition.z)>0.4) vColor.b=0;                                  \n"
 //                    + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
 //                    + "   if(abs(aPosition.z)<0.1) vColor.ra=vec2(1,1);                                  \n"
@@ -57,6 +58,19 @@ public class Earth {
                     // gl_Position is a special variable used to store the final position.
                     // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
                     + "   gl_Position = uMVPMatrix * aPosition;                            \n"
+
+                    // lighting per vertex
+                    // http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/directional-lights/
+                    +"vec3 l_dir = uLightPosition-(uMVMatrix * vec4(aPosition.xyz,1)).xyz; \n"
+                    // transform normal to camera space and normalize it
+                    +"vec3 n = normalize(uMVMatrix * vec4(aNormal,1)).xyz; \n"
+                    // compute the intensity as the dot product
+                    // the max prevents negative intensity values
+                    +"float intensity = max(dot(n, l_dir), 0.25); \n"
+                    +"vec4 diffuse = vColor; \n"
+                    // Compute the color per vertex
+                    +"vColor = intensity * diffuse; \n"
+//                    + "   vColor = 0.75*aColor + 0.5*(uMVMatrix*aPosition-aPosition);                         \n"
                     + "}                                                                   \n";
 
     private final String fragmentShaderCode =
@@ -217,6 +231,110 @@ public class Earth {
      *
      * @param mvpMatrix - The Model View Project matrix in which to draw
      * this com.example.android.shape.
+     * @param mvMatrix - The Model View matrix in which to draw
+     * this com.example.android.shape.
+     */
+    public void draw(float[] mvpMatrix, float[] mvMatrix, float [] l_pos) {
+        // Add program to OpenGL environment
+        GLES20.glUseProgram(mProgram);
+
+        // get handle to vertex shader's aPosition member
+        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
+        // Pass in the position information
+        vertexBuffer.position(0);
+        GLES20.glVertexAttribPointer(mPositionHandle,
+                COORDS_PER_VERTEX,
+                GLES20.GL_FLOAT,
+                false,
+                vertexStride,
+                vertexBuffer
+        );
+        // Enable a handle to the vertices
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+        // get handle to vertex shader's aColor member
+        mColorHandle = GLES20.glGetAttribLocation(mProgram, "aColor");
+        // Pass in the position information
+        colorBuffer.position(0);
+        GLES20.glVertexAttribPointer(mColorHandle,
+                4,
+                GLES20.GL_FLOAT,
+                false,
+                0,
+                colorBuffer
+        );
+        // Enable a handle to the vertices
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+
+
+//        float LightPosition[] = {
+//            8f, 0f, 0f
+//        };
+
+//        get handle to fragment shader's aColor member
+        int mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
+//        Set color for drawing the shape
+        GLES20.glUniform3fv(mLightPositionHandle, 1, l_pos, 0);
+
+
+        // get handle to fragment shader's aNormal member
+        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
+        // Pass in the normal information
+        normalBuffer.position(0);
+        GLES20.glVertexAttribPointer(
+                mNormalHandle,
+                3,
+                GLES20.GL_FLOAT,
+                false,
+                0,
+                normalBuffer
+        );
+        // Enable a handle to the normals
+        GLES20.glEnableVertexAttribArray(mNormalHandle);
+
+
+        //  get handle to fragment shader's aLightPosition member
+//        mLightPositionHandle = GLES20.glGetUniformLocation(mProgram, "uLightPosition");
+        // Pass in the light position in eye space.
+//        GLES20.glUniform3f(
+//                mLightPositionHandle, 0f,0f,0f
+//                mLightPosInEyeSpace[0],
+//                mLightPosInEyeSpace[1],
+//                mLightPosInEyeSpace[2]
+//        );
+
+
+        // get handle to com.example.android.shape's transformation matrix
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        MyGLRenderer.checkGlError("glGetUniformLocation");
+
+        // Apply the projection and view transformation
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+        MyGLRenderer.checkGlError("glUniformMatrix4fv");
+
+        // get handle to com.example.android.shape's transformation matrix
+        int mMVMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVMatrix");
+        MyGLRenderer.checkGlError("glGetUniformLocation");
+
+        // Apply the projection and view transformation
+        GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mvMatrix, 0);
+        MyGLRenderer.checkGlError("glUniformMatrix4fv");
+
+        // Draw the shape with array
+        GLES20.glDrawArrays(
+                GLES20.GL_TRIANGLES, 0, vertexCount
+//                GLES20.GL_LINE_STRIP, 0, vertexCount
+        );
+
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(mPositionHandle);
+    }
+
+    /**
+     * Encapsulates the OpenGL ES instructions for drawing this com.example.android.shape.
+     *
+     * @param mvpMatrix - The Model View Project matrix in which to draw
+     * this com.example.android.shape.
      */
     public void draw(float[] mvpMatrix) {
         // Add program to OpenGL environment
@@ -305,5 +423,4 @@ public class Earth {
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
     }
-
 }

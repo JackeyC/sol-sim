@@ -77,11 +77,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
                 if (y > ScreenBottom & x < ScreenLeft) {
                     System.out.println(" bottom left");
-                    mRenderer.setPlanet(mRenderer.getPlanet() - 1);
+                    mRenderer.previousPlanet();
                 }
                 else if (y > ScreenBottom & x >ScreenRight) {
                     System.out.println("bottom right");
-                    mRenderer.setPlanet(mRenderer.getPlanet() + 1);
+                    mRenderer.nextPlanet();
                 }
         }
 

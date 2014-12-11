@@ -50,6 +50,7 @@ public class Saturn {
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;                                       \n"
+//                    + "   vColor = aColor + 0.25*vPosition;                           \n"
                     + "   if(abs(aPosition.z)>0.4) vColor.b=0;                                  \n"
                     + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
                     + "   if(abs(aPosition.z)<0.1) vColor.ra=vec2(1,1);                                  \n"
