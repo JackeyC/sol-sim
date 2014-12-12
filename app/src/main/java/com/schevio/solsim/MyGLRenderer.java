@@ -27,7 +27,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float angle;
 
     private static final String TAG = "MyGLRenderer";
-    private SkyBox mSkyBox;
+//    private SkyBox mSkyBox;
     private StarsDome mStarsDome;
     private Axis mAxis;
     private Sun mSun;
@@ -35,7 +35,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private Moon mMoon;
     private Saturn mSaturn;
     private Saturn_Ring mSaturn_Ring;
-    private SpaceShip mSpaceShip;
+//    private SpaceShip mSpaceShip;
 
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
@@ -51,7 +51,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle_Y;
     private float mCam_distance = 7f;
     private int mPlanet = 1;
-    private boolean mOrbitsOn;
     private boolean mAxisOn;
 
     float cam_x;
@@ -76,7 +75,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float Saturn_x;
     float Saturn_y;
 
-    int mSpeed = 1;
+    int mSpeed = 1000;
     int Earth_day_period;
 
     /**
@@ -99,7 +98,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 //        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-        mSkyBox = new SkyBox();
+//        mSkyBox = new SkyBox();
         mStarsDome = new StarsDome();
         mAxis = new Axis();
         mSun = new Sun();
@@ -154,29 +153,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
             mCam_distance = 100f;
         }
 
-//        if (mPlanet > 3) {
-//            mPlanet = 0;
-//        }
-//        if (mPlanet < 0) {
-//            mPlanet = 3;
-//        }
-//        if (mPlanet == 0) {
-//            focus_x = Sun_x;
-//            focus_y = Sun_y;
-//        }
-//        if (mPlanet == 1) {
-//            focus_x = Earth_x;
-//            focus_y = Earth_y;
-//        }
-//        if (mPlanet == 2) {
-//            focus_x = Moon_x;
-//            focus_y = Moon_y;
-//        }
-//        if (mPlanet == 3) {
-//            focus_x = Saturn_x;
-//            focus_y = Saturn_y;
-//        }
-
         float xs[]={Sun_x, Earth_x, Moon_x, Saturn_x};
         float ys[]={Sun_y, Earth_y, Moon_y, Saturn_y};
         focus_x = xs[getPlanet()];
@@ -197,11 +173,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 //        mSkyBox.draw(SkyBox);
 //        mSpaceShip.draw(mMVPMatrix);
 
-//        Matrix.setIdentityM(starsDome, 0);
-//        Matrix.translateM(starsDome, 0, focus_x, focus_y, focus_z);
-//        Matrix.scaleM(starsDome, 0, 500, 500, 500);
-//        Matrix.multiplyMM(starsDome, 0, mMVPMatrix, 0, starsDome, 0);
-//        mStarsDome.draw(starsDome);
+        Matrix.setIdentityM(starsDome, 0);
+        Matrix.translateM(starsDome, 0, focus_x, focus_y, focus_z);
+        Matrix.scaleM(starsDome, 0, 500, 500, 500);
+        Matrix.multiplyMM(starsDome, 0, mMVPMatrix, 0, starsDome, 0);
+        mStarsDome.draw(starsDome);
 
         if (mSpeed > 0) {
             Earth_day_period = 3600000 / mSpeed;
@@ -223,7 +199,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         float Moon_orbit = 360f / Moon_period * ((int) time3);
         float Moon_orbit_radian = MyGLSurfaceView.TwoPi / Moon_period * ((int) time3);
 
-        int Saturn_period = Earth_year_period * 29;
+        int Saturn_period = Earth_year_period * 8; //29
         long time4 = SystemClock.uptimeMillis() % Saturn_period;
         float Saturn_year = 360f / Saturn_period * ((int) time4);
         float Saturn_year_radian = MyGLSurfaceView.TwoPi / Saturn_period * ((int) time4);
@@ -259,10 +235,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.rotateM(earth, 0, Earth_day, 0f, 0f, 1f);
         Matrix.scaleM(earth, 0, 3, 3, 3);
         Matrix.multiplyMM(earth, 0, mMVPMatrix, 0, earth, 0);
-//        mEarth.draw(earth);
-        float[] earthModelViewMatrix = new float[16];
-        Matrix.multiplyMM(earthModelViewMatrix, 0, mViewMatrix, 0, earth, 0);
-        mEarth.draw(earth, earthModelViewMatrix, l_pos);
+        mEarth.draw(earth);
+//        float[] earthModelViewMatrix = new float[16];
+//        Matrix.multiplyMM(earthModelViewMatrix, 0, mViewMatrix, 0, earth, 0);
+//        mEarth.draw(earth, earthModelViewMatrix, l_pos);
 
         Matrix.setIdentityM(moon, 0);
         Matrix.translateM(moon, 0, Moon_x, Moon_y, 0);
@@ -273,7 +249,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(saturn, 0);
         Matrix.setIdentityM(saturn_ring, 0);
         Matrix.translateM(saturn, 0, Saturn_x, Saturn_y, 0);
-        Matrix.rotateM(saturn, 0, -23.45f, 0f, 1f, 0f);
+        Matrix.rotateM(saturn, 0, 23.45f, 1f, 0f, 0f);
         Matrix.scaleM(saturn_ring, 0, saturn, 0, 4, 4, 4);
         Matrix.multiplyMM(saturn_ring, 0, mMVPMatrix, 0, saturn_ring, 0);
         mSaturn_Ring.draw(saturn_ring);
@@ -372,10 +348,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         return mPlanet;
     }
 
-    public boolean getOrbits() {
-        return mOrbitsOn;
-    }
-
     public boolean getAxis() {
         return mAxisOn;
     }
@@ -412,14 +384,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public  void previousPlanet()
     {
         mPlanet = (mPlanet - 1 + getNumOfPlanet()) % getNumOfPlanet();
-    }
-
-    public void setPlanet(int planet) {
-        mPlanet = (planet + getNumOfPlanet()) % getNumOfPlanet();
-    }
-
-    public void setOrbits(boolean orbits) {
-        mOrbitsOn = orbits;
     }
 
     public void setAxis(boolean axis) {

@@ -51,7 +51,7 @@ public class Saturn {
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;                                       \n"
 //                    + "   vColor = aColor + 0.25*vPosition;                           \n"
-                    + "   if(abs(aPosition.z) > 0.3) vColor.b=0;                                  \n"
+//                    + "   if(abs(aPosition.z) > 0.3) vColor.b=0;                                  \n"
                     + "   if(abs(aPosition.z) > 0.2 && abs(aPosition.z) <= 0.3) vColor*=1.5;                                  \n"
                     + "   if(abs(aPosition.z) <= 0.2) vColor.ra=vec2(1,1);                                  \n"
                     + "   vPosition = aPosition;                                  \n"
@@ -65,10 +65,10 @@ public class Saturn {
                     // precision in the fragment shader.
                     + "varying vec4 vColor;          \n"		// This is the color from the vertex shader interpolated across the
                     // triangle per fragment.
-                    + "varying vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
+//                    + "varying vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
                     + "void main()                    \n"		// The entry point for our fragment shader.
                     + "{                              \n"
-//                    + "   vec4 color = vColor;                          \n"
+//                    + "   varying vec4 color = vColor;                          \n"
 //                    + "   if(abs(vPosition.z)>0.4) color.b=0;                                  \n"
 //                    + "   if(abs(vPosition.z)>0.1 && abs(vPosition.z)<0.4) color*=1.5;                                  \n"
 //                    + "   if(abs(vPosition.z)<0.1) color.ra=vec2(1,1);                                  \n"
@@ -82,7 +82,7 @@ public class Saturn {
     private int mPositionHandle;
     private int mColorHandle;
     private int mNormalHandle;
-//    private int mLightPositionHandle;
+    //    private int mLightPositionHandle;
     private int mMVPMatrixHandle;
 
     /** Used to hold a light centered on the origin in model space. We need a 4th coordinate so we can get translations to work when
@@ -119,7 +119,7 @@ public class Saturn {
         Random random = new Random();
 
         for (int i = 0; i < shape_faces * 3; i++) {
-            int n = random.nextInt(2);
+            int n = random.nextInt(9);
             if (n == 0) {
                 Colors[idx++] = 0.4f;
                 Colors[idx++] = 0.4f;
@@ -220,19 +220,19 @@ public class Saturn {
 
 
         // get handle to fragment shader's aNormal member
-        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
-        // Pass in the normal information
-        normalBuffer.position(0);
-        GLES20.glVertexAttribPointer(
-                mNormalHandle,
-                3,
-                GLES20.GL_FLOAT,
-                false,
-                0,
-                normalBuffer
-        );
-        // Enable a handle to the normals
-        GLES20.glEnableVertexAttribArray(mNormalHandle);
+//        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
+//        // Pass in the normal information
+//        normalBuffer.position(0);
+//        GLES20.glVertexAttribPointer(
+//                mNormalHandle,
+//                3,
+//                GLES20.GL_FLOAT,
+//                false,
+//                0,
+//                normalBuffer
+//        );
+//        // Enable a handle to the normals
+//        GLES20.glEnableVertexAttribArray(mNormalHandle);
 
 
         //  get handle to fragment shader's aLightPosition member

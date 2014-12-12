@@ -15,20 +15,19 @@ public class StarsDome {
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
             "uniform mat4 uMVPMatrix;      \n"		// A constant representing the combined model/view/projection matrix.
-                    + "uniform mat4 uMVMatrix;       \n"		// A constant representing the combined model/view matrix.
-
                     + "attribute vec4 aPosition;     \n"		// Per-vertex position information we will pass in.
                     + "attribute vec4 aColor;        \n"		// Per-vertex color information we will pass in.
                     + "attribute vec3 aNormal;       \n"		// Per-vertex normal information we will pass in.
 
                     + "varying vec4 vColor;          \n"		// This will be passed into the fragment shader.
-                    + "varying vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
+
                     + "void main() {        \n"
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;                                       \n"
-                    + "   vPosition = aPosition;                                  \n"
+//                    + "   vPosition = aPosition;                                  \n"
                     + "   gl_Position = uMVPMatrix * aPosition;                            \n"
+                    + "   gl_PointSize = 3.0;         \n"
                     + "}                                                                   \n";
 
     private final String fragmentShaderCode =
@@ -36,7 +35,6 @@ public class StarsDome {
                     // precision in the fragment shader.
                     + "varying vec4 vColor;          \n"		// This is the color from the vertex shader interpolated across the
                     // triangle per fragment.
-                    + "varying vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
                     + "void main()                    \n"		// The entry point for our fragment shader.
                     + "{                              \n"
                     + "   gl_FragColor = vColor;     \n"		// Pass the color directly through the pipeline.
@@ -77,21 +75,16 @@ public class StarsDome {
         for (int i = 0; i < shape_faces * 3; i++) {
             int n = random.nextInt(3);
             if (n == 0) {
-                Colors[idx++] = 1.0f;
-                Colors[idx++] = 1.0f;
-                Colors[idx++] = 1.0f;
-                Colors[idx++] = 1.0f;
-            }
-            else if (n == 2) {
-                Colors[idx++] = 1.0f;
-                Colors[idx++] = 1.0f;
-                Colors[idx++] = 0.0f;
+                for (int j = 0; j < 3; j++) {
+                    int n2 = random.nextInt(11);
+                    Colors[idx++] = 0.1f * n2;
+                }
                 Colors[idx++] = 1.0f;
             }
             else {
                 Colors[idx++] = 0.0f;
                 Colors[idx++] = 0.0f;
-                Colors[idx++] = 1.0f;
+                Colors[idx++] = 0.0f;
                 Colors[idx++] = 1.0f;
             }
         }
@@ -171,19 +164,19 @@ public class StarsDome {
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
         // get handle to fragment shader's aNormal member
-        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
-        // Pass in the normal information
-        normalBuffer.position(0);
-        GLES20.glVertexAttribPointer(
-                mNormalHandle,
-                3,
-                GLES20.GL_FLOAT,
-                false,
-                0,
-                normalBuffer
-        );
-        // Enable a handle to the normals
-        GLES20.glEnableVertexAttribArray(mNormalHandle);
+//        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
+//        // Pass in the normal information
+//        normalBuffer.position(0);
+//        GLES20.glVertexAttribPointer(
+//                mNormalHandle,
+//                3,
+//                GLES20.GL_FLOAT,
+//                false,
+//                0,
+//                normalBuffer
+//        );
+//        // Enable a handle to the normals
+//        GLES20.glEnableVertexAttribArray(mNormalHandle);
 
         // get handle to com.example.android.shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");

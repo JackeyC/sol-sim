@@ -58,7 +58,7 @@ public class Saturn_Ring {
 
     int Star_vertex = 30;
     float radius = 1.0f;
-    float inner_radius = 0.8f;
+    float inner_radius = 0.7f;
 
     float color[] = { 0.9f, 0.8f, 0.2f, 0.0f };
 

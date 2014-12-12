@@ -15,9 +15,6 @@ public class Moon {
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
             "uniform mat4 uMVPMatrix;      \n"		// A constant representing the combined model/view/projection matrix.
-                    + "uniform mat4 uMVMatrix;       \n"		// A constant representing the combined model/view matrix.
-                    + "uniform vec3 uLightPosition;       \n"	    // The position of the light in eye space.
-
                     + "attribute vec4 vPosition;     \n"		// Per-vertex position information we will pass in.
                     + "attribute vec4 aColor;        \n"		// Per-vertex color information we will pass in.
                     + "attribute vec3 aNormal;       \n"		// Per-vertex normal information we will pass in.
