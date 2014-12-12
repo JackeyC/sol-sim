@@ -52,6 +52,8 @@ public class Saturn_Ring {
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
+    float center_x = 0.0f;
+    float center_y = 0.0f;
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 2;
@@ -62,7 +64,7 @@ public class Saturn_Ring {
 
     float color[] = { 0.9f, 0.8f, 0.2f, 0.0f };
 
-    private final int vertexCount = Star_vertex * 2 + 2;
+    private final int vertexCount = Star_vertex * 2 + 1;
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     float vertexCoords[] = new float[vertexCount*2 + 4];
@@ -72,14 +74,14 @@ public class Saturn_Ring {
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
     public Saturn_Ring() {
-//        vertexCoords[idx++] = center_x;
-//        vertexCoords[idx++] = center_y;
+        vertexCoords[idx++] = center_x;
+        vertexCoords[idx++] = center_y;
 
-        int outerVertexCount = vertexCount - 2;
+        float outerVertexCount = vertexCount;
         boolean outer_vertex = true;
 
-        for (int i = 0; i < outerVertexCount; i++) {
-            float percent = (i / (float) (outerVertexCount - 1));
+        for (int i = 0; i < outerVertexCount - 1; i++) {
+            float percent = i / (outerVertexCount - 1);
             float rad = (float) (percent * 2 * Math.PI);
             float outer_x;
             float outer_y;
@@ -98,10 +100,10 @@ public class Saturn_Ring {
             vertexCoords[idx++] = outer_x;
             vertexCoords[idx++] = outer_y;
         }
-        vertexCoords[idx++] = vertexCoords[0];
-        vertexCoords[idx++] = vertexCoords[1];
-//        vertexCoords[idx++] = vertexCoords[2];
-//        vertexCoords[idx++] = vertexCoords[3];
+        vertexCoords[idx++] = vertexCoords[2];
+        vertexCoords[idx++] = vertexCoords[3];
+        vertexCoords[idx++] = vertexCoords[4];
+        vertexCoords[idx++] = vertexCoords[5];
 
         // initialize vertex byte buffer for com.example.android.shape coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(
@@ -154,7 +156,8 @@ public class Saturn_Ring {
         GLES20.glVertexAttribPointer(
                 mPositionHandle, COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT, false,
-                vertexStride, vertexBuffer);
+                vertexStride, vertexBuffer
+        );
 
         // get handle to fragment shader's vColor member
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
@@ -174,9 +177,7 @@ public class Saturn_Ring {
 
         // Draw the Polygon
         GLES20.glDrawArrays(
-                GLES20.GL_TRIANGLE_STRIP, 0, vertexCount
-//                GLES20.GL_LINE_LOOP, 2, vertexCount
-//                GLES20.GL_LINE_STRIP, 0, vertexCount
+                GLES20.GL_TRIANGLE_STRIP, 1, vertexCount + 1
         );
 
         GLES20.glEnable(GLES20.GL_CULL_FACE);

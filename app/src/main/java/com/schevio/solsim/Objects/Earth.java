@@ -51,9 +51,9 @@ public class Earth {
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
                     + "   vColor = aColor;                                                \n"
 //                    + "   vColor = 0.75*aColor + 0.5*aPosition;       \n"
-//                    + "   if(abs(aPosition.z)>0.4) vColor.b=0;                                  \n"
+//                    + "   if(abs(aPosition.z)>0.4) vColor=1;                                  \n"
 //                    + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
-//                    + "   if(abs(aPosition.z)<0.1) vColor.ra=vec2(1,1);                                  \n"
+                    + "   if(abs(aPosition.z)>0.48) vColor.rgb=vec3(1,1,1);                                  \n"
 //                    + "   vPosition = aPosition;                                  \n"
                     // gl_Position is a special variable used to store the final position.
                     // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.

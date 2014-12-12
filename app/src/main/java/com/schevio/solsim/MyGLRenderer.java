@@ -50,7 +50,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle_X;
     private float mAngle_Y;
     private float mCam_distance = 7f;
-    private int mPlanet = 1;
+    private int mPlanet = 3;
     private boolean mAxisOn;
 
     float cam_x;

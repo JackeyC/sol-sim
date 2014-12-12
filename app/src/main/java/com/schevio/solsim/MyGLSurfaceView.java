@@ -34,19 +34,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
     private float mPreviousX;
     private float mPreviousY;
 
-//    public boolean onDoubleTapEvent (MotionEvent event){
-//
-//
-//        float x = event.getTouchMinor();
-//        float y = event.getTouchMinor();
-//        float zoom=0;
-//
-//
-//        System.out.println("zoom = " + zoom);
-//
-//        return true;
-//    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // MotionEvent reports input details from the touch screen
@@ -68,19 +55,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (y < ScreenTop & x < ScreenLeft) {
-                    System.out.println("top left");
-//                    mRenderer.setSpeed(mRenderer.getSpeed());
                 }
                 else if (y < ScreenTop & x > ScreenRight) {
-                    System.out.println("top right");
                     mRenderer.setAxis(!mRenderer.getAxis());
                 }
                 if (y > ScreenBottom & x < ScreenLeft) {
-                    System.out.println(" bottom left");
                     mRenderer.previousPlanet();
                 }
                 else if (y > ScreenBottom & x >ScreenRight) {
-                    System.out.println("bottom right");
                     mRenderer.nextPlanet();
                 }
         }
@@ -105,9 +87,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                 //Debug
 //                System.out.println("dx = " + dx);
-//                System.out.println("dy = " + dy);
-//                System.out.println("angle X = " + mRenderer.getAngle_X());
-//                System.out.println("angle Y = " + mRenderer.getAngle_Y());
         }
 
         mPreviousX = x;
