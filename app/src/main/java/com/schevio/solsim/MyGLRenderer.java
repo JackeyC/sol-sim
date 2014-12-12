@@ -50,7 +50,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private float mAngle_X;
     private float mAngle_Y;
     private float mCam_distance = 7f;
-    private int mPlanet = 3;
+    private int mPlanet = 1;
     private boolean mAxisOn;
 
     float cam_x;
@@ -75,7 +75,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float Saturn_x;
     float Saturn_y;
 
-    int mSpeed = 1000;
+    int mSpeed = 500;
     int Earth_day_period;
 
     /**
