@@ -1,5 +1,6 @@
 package com.schevio.solsim.Objects;
 
+import android.content.Context;
 import android.opengl.GLES20;
 
 import com.schevio.solsim.MyGLRenderer;
@@ -30,30 +31,30 @@ public class Earth {
                     // for the matrix multiplication product to be correct.
 
                     // Transform the vertex into eye space.
-//                    + "   vec3 modelViewVertex = vec3(uMVMatrix * aPosition);              \n"
+                    + "   vec3 modelViewVertex = vec3(uMVMatrix * aPosition);              \n"
 
                     // Transform the normal's orientation into eye space.
-//                    + "   vec3 modelViewNormal = vec3(uMVMatrix * vec4(aNormal, 0.0));     \n"
+                    + "   vec3 modelViewNormal = vec3(uMVMatrix * vec4(aNormal, 0.0));     \n"
 
                     // Will be used for attenuation.
-//                    + "   float distance = length(uLightPosition - modelViewVertex);             \n"
+//                    + "   float distance = length(vec3(0,0,0) - modelViewVertex);             \n"
 
                     // Get a lighting direction vector from the light to the vertex.
-//                    + "   vec3 lightVector = normalize(uLightPosition - modelViewVertex);        \n"
+                    + "   vec3 lightVector = normalize(vec3(0,0,0) - modelViewVertex);        \n"
 
                     // Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
                     // pointing in the same direction then it will get max illumination.
-//                    + "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);       \n"
+                    + "   float diffuse = max(dot(modelViewNormal, lightVector), 0.1);       \n"
 
                     // Attenuate the light based on distance.
 //                    + "   diffuse = diffuse * (1.0 / (1.0 + (0.025 * distance * distance)));  \n"
 
                     // Multiply the color by the illumination level. It will be interpolated across the triangle.
-                    + "   vColor = aColor;                                                \n"
+                    + "   vColor = aColor * diffuse;                                                \n"
 //                    + "   vColor = 0.75*aColor + 0.5*aPosition;       \n"
 //                    + "   if(abs(aPosition.z)>0.4) vColor=1;                                  \n"
 //                    + "   if(abs(aPosition.z)>0.1 && abs(aPosition.z)<0.4) vColor*=1.5;                                  \n"
-                    + "   if(abs(aPosition.z)>0.48) vColor.rgb=vec3(1,1,1);                                  \n"
+//                    + "   if(abs(aPosition.z)>0.48) vColor.rgb=vec3(1,1,1);                                  \n"
 //                    + "   vPosition = aPosition;                                  \n"
                     // gl_Position is a special variable used to store the final position.
                     // Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
@@ -276,19 +277,19 @@ public class Earth {
 
 
         // get handle to fragment shader's aNormal member
-//        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
-//        // Pass in the normal information
-//        normalBuffer.position(0);
-//        GLES20.glVertexAttribPointer(
-//                mNormalHandle,
-//                3,
-//                GLES20.GL_FLOAT,
-//                false,
-//                0,
-//                normalBuffer
-//        );
-//        // Enable a handle to the normals
-//        GLES20.glEnableVertexAttribArray(mNormalHandle);
+        mNormalHandle = GLES20.glGetAttribLocation(mProgram, "aNormal");
+        // Pass in the normal information
+        normalBuffer.position(0);
+        GLES20.glVertexAttribPointer(
+                mNormalHandle,
+                3,
+                GLES20.GL_FLOAT,
+                false,
+                0,
+                normalBuffer
+        );
+        // Enable a handle to the normals
+        GLES20.glEnableVertexAttribArray(mNormalHandle);
 
 
         //  get handle to fragment shader's aLightPosition member

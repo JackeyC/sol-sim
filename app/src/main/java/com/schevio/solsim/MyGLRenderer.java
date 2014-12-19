@@ -1,5 +1,6 @@
 package com.schevio.solsim;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -10,6 +11,7 @@ import android.util.Log;
 import com.schevio.solsim.Objects.Axis;
 import com.schevio.solsim.Objects.Earth;
 import com.schevio.solsim.Objects.Moon;
+import com.schevio.solsim.Objects.RawResourceReader;
 import com.schevio.solsim.Objects.Saturn;
 import com.schevio.solsim.Objects.Saturn_Ring;
 import com.schevio.solsim.Objects.SkyBox;
@@ -27,6 +29,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     float angle;
 
     private static final String TAG = "MyGLRenderer";
+
+//    private final Context mActivityContext;
 //    private SkyBox mSkyBox;
     private StarsDome mStarsDome;
     private Axis mAxis;
@@ -126,7 +130,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         // Enable depth testing
 //        GLES20.glClearDepthf(1.0f);
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 //        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 //        GLES20.glDepthMask(true);
 
@@ -323,11 +327,17 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         }
     }
 
-    /**
-     * Returns the rotation angle of the triangle com.example.android.shape (mTriangle).
-     *
-     * @return - A float representing the rotation angle.
-     */
+
+//    protected String getVertexShader()
+//    {
+//        return RawResourceReader.readTextFileFromRawResource(R.raw.vertex_shader);
+//    }
+//
+//    protected String getFragmentShader()
+//    {
+//        return RawResourceReader.readTextFileFromRawResource(R.raw.fragment_shader);
+//    }
+
     public float getAngle_X() {
         return mAngle_X;
     }
